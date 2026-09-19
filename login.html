@@ -4,45 +4,23 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Menezo — Connect Your Channel</title>
-<meta name="description" content="Sign in to Menezo, your AI creator manager.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 <style>
-  :root{
-    --bg:#0a0710; --card:#14101f; --card2:#1a1428; --line:rgba(255,255,255,.08);
-    --text:#f3f0fa; --sub:#9791ab;
-    --grad: linear-gradient(135deg,#7c3aed 0%,#ec4899 55%,#f59e0b 100%);
-  }
-  *{box-sizing:border-box;margin:0;padding:0;}
-  body{
-    background: radial-gradient(circle at 30% 0%, #1a1030 0%, #0a0710 55%);
-    font-family:'Inter',sans-serif; color:var(--text);
-    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px 16px;
-  }
+  body{ display:flex; align-items:center; justify-content:center; padding:24px 16px; }
   .wrap{ width:100%; max-width:430px; }
   .brand{ text-align:center; margin-bottom:22px; }
-  .logo{ width:56px; height:56px; border-radius:16px; background:var(--grad); margin:0 auto 12px;
-    display:flex; align-items:center; justify-content:center; font-family:'Sora'; font-weight:800; font-size:26px;
-    box-shadow: 0 10px 30px -6px rgba(124,58,237,.6); }
+  .logo{ width:56px; height:56px; border-radius:16px; background:var(--grad); margin:0 auto 12px; display:flex; align-items:center; justify-content:center; font-family:'Sora'; font-weight:800; font-size:26px; box-shadow: 0 10px 30px -6px rgba(124,58,237,.6); }
   .brand h1{ font-family:'Sora'; font-weight:800; font-size:24px; }
   .brand p{ font-size:12.5px; color:var(--sub); margin-top:5px; }
-
-  .card{ background:var(--card); border:1px solid var(--line); border-radius:22px; padding:22px;
-    box-shadow: 0 20px 60px rgba(0,0,0,.5); backdrop-filter: blur(16px); }
-
+  .card{ background:var(--card); border:1px solid var(--line); border-radius:22px; padding:22px; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
   label{ display:block; font-size:12px; font-weight:600; color:#cfc9de; margin-bottom:6px; }
-  input, select{
-    width:100%; background:#0c0916; border:1px solid var(--line); border-radius:12px;
-    padding:11px 13px; color:var(--text); font-size:13.5px; margin-bottom:14px;
-  }
+  input, select{ width:100%; background:#0c0916; border:1px solid var(--line); border-radius:12px; padding:11px 13px; color:var(--text); font-size:13.5px; margin-bottom:14px; }
   input::placeholder{ color:#5c5570; }
   input:focus, select:focus{ outline:none; border-color:#7c3aed; }
   .row2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-
-  .submit{ width:100%; padding:13px; border:none; border-radius:12px; background:var(--grad);
-    color:#fff; font-family:'Sora'; font-weight:700; font-size:14px; cursor:pointer; margin-top:4px; }
-  .submit:disabled{ opacity:.7; }
-
+  .submit{ width:100%; padding:13px; border:none; border-radius:12px; background:var(--grad); color:#fff; font-family:'Sora'; font-weight:700; font-size:14px; cursor:pointer; margin-top:4px; }
   .note{ text-align:center; font-size:11px; color:var(--sub); margin-top:16px; }
 </style>
 </head>
@@ -53,83 +31,54 @@
     <h1>Menezo</h1>
     <p>Create · Build · Grow — connect your creator identity</p>
   </div>
-
   <div class="card">
     <form id="loginForm" onsubmit="handleLogin(event)">
       <label for="creatorName">Your Full Name</label>
       <input type="text" id="creatorName" required placeholder="Enter your name" autocomplete="name">
-
       <label for="creatorEmail">Email</label>
       <input type="email" id="creatorEmail" required placeholder="Enter your email" autocomplete="email">
-
       <label for="channelId">Channel ID / Handle</label>
       <input type="text" id="channelId" required placeholder="e.g. @yourhandle">
-
       <div class="row2">
         <div>
           <label for="platform">Primary Platform</label>
           <select id="platform">
             <option value="">Select platform</option>
-            <option>YouTube</option>
-            <option>Instagram</option>
-            <option>TikTok</option>
-            <option>X</option>
-            <option>Facebook</option>
-            <option>LinkedIn</option>
-            <option>Pinterest</option>
+            <option>YouTube</option><option>Instagram</option><option>TikTok</option>
+            <option>X</option><option>Facebook</option><option>LinkedIn</option><option>Pinterest</option>
           </select>
         </div>
         <div>
           <label for="niche">Niche</label>
           <select id="niche">
             <option value="">Select niche</option>
-            <option>AI & Tech Tutorials</option>
-            <option>Finance & Wealth</option>
-            <option>Coding & Dev</option>
-            <option>Fitness & Wellness</option>
-            <option>Lifestyle & Vlogs</option>
-            <option>Gaming</option>
-            <option>Other</option>
+            <option>AI & Tech Tutorials</option><option>Finance & Wealth</option><option>Coding & Dev</option>
+            <option>Fitness & Wellness</option><option>Lifestyle & Vlogs</option><option>Gaming</option><option>Other</option>
           </select>
         </div>
       </div>
-
       <label for="followersCount">Current Community Size (Estimate)</label>
       <input type="text" id="followersCount" placeholder="e.g. 5K, leave blank if just starting">
-
       <button type="submit" id="submitBtn" class="submit">Launch My Dashboard</button>
     </form>
-
     <p class="note">Your data stays in your browser and syncs with your AI manager.</p>
   </div>
 </div>
-
 <script>
   async function handleLogin(e){
     e.preventDefault();
     const btn = document.getElementById('submitBtn');
     btn.disabled = true; btn.textContent = 'Connecting...';
-
     const name = document.getElementById('creatorName').value.trim();
     const email = document.getElementById('creatorEmail').value.trim();
     let channelId = document.getElementById('channelId').value.trim();
-    if (!channelId.startsWith('@') && !channelId.startsWith('UC') && !channelId.includes('.')) {
-      channelId = '@' + channelId;
-    }
+    if (!channelId.startsWith('@') && !channelId.startsWith('UC') && !channelId.includes('.')) channelId = '@' + channelId;
     const platform = document.getElementById('platform').value || 'YouTube';
     const niche = document.getElementById('niche').value || 'General';
     const followers = document.getElementById('followersCount').value.trim() || '0';
-
     const userData = { name, email, channelId, platform, niche, followers, loginTime: new Date().toISOString(), score: 50 };
-
     localStorage.setItem('menezo_user', JSON.stringify(userData));
-
-    try {
-      await fetch('/api/login', {
-        method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(userData)
-      });
-    } catch(err){}
-
+    try { await fetch('/api/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(userData) }); } catch(err){}
     setTimeout(() => { window.location.href = 'dashboard.html'; }, 400);
   }
 </script>
