@@ -1,186 +1,118 @@
-// CreatorOS Global JavaScript
-// Profile setup + AI Studio generate — Render Backend Sync
+// ===== Platform definitions (shared across all pages) =====
+const PLATFORMS = [
+  { key:'YouTube', cls:'yt', icon:'YT' },
+  { key:'Instagram', cls:'ig', icon:'IG' },
+  { key:'TikTok', cls:'tt', icon:'TT' },
+  { key:'Facebook', cls:'fb', icon:'FB' },
+  { key:'X', cls:'xx', icon:'X' },
+  { key:'LinkedIn', cls:'li', icon:'in' },
+  { key:'Pinterest', cls:'pn', icon:'P' },
+  { key:'Snapchat', cls:'sc', icon:'SC' },
+  { key:'Spotify', cls:'sp', icon:'SP' },
+  { key:'Twitch', cls:'tw', icon:'TW' },
+  { key:'Threads', cls:'th', icon:'TH' },
+];
 
-document.addEventListener("DOMContentLoaded", () => {
-  // Real Render Backend URL
-  const API_BASE_URL = "https://creatoros-ai.onrender.com";
+// ===== Auth helpers =====
+function getUser(){
+  let user = { name:'Creator', channelId:'@you', platform:'YouTube', niche:'General', followers:'0', score:50 };
+  try {
+    const saved = localStorage.getItem('menezo_user');
+    if (saved) user = { ...user, ...JSON.parse(saved) };
+  } catch(e){}
+  return user;
+}
 
-  const profileCard = document.getElementById("profileCard");
-  const generateCard = document.getElementById("generateCard");
-  const outputCard = document.getElementById("outputCard");
-  const profileBadge = document.getElementById("profileBadge");
-  const profileBadgeText = document.getElementById("profileBadgeText");
-
-  // Agar ye elements page pe nahi hain, matlab ye AI Studio page nahi hai — skip karo
-  if (!profileCard) return;
-
-  const emailInput = document.getElementById("emailInput");
-  const nameInput = document.getElementById("nameInput");
-  const channelInput = document.getElementById("channelInput");
-  const profilePlatformSelect = document.getElementById("profilePlatformSelect");
-  const nicheInput = document.getElementById("nicheInput");
-  const styleInput = document.getElementById("styleInput");
-  const saveProfileBtn = document.getElementById("saveProfileBtn");
-  const profileError = document.getElementById("profileError");
-  const editProfileBtn = document.getElementById("editProfileBtn");
-
-  const generateBtn = document.getElementById("generateBtn");
-  const topicInput = document.getElementById("topicInput");
-  const platformSelect = document.getElementById("platformSelect");
-  const contentTypeSelect = document.getElementById("contentTypeSelect");
-  const languageSelect = document.getElementById("languageSelect");
-  const outputBox = document.getElementById("outputBox");
-
-  // ---------------------------------------------
-  // PAGE LOAD — agar email save hai to seedha profile check karo
-  // ---------------------------------------------
-  const savedEmail = localStorage.getItem("creatoros_email");
-  if (savedEmail) {
-    checkExistingProfile(savedEmail);
+function requireLogin(){
+  if (!localStorage.getItem('menezo_user')) {
+    window.location.href = 'login.html';
+    return null;
   }
+  return getUser();
+}
 
-  async function checkExistingProfile(email) {
-    try {
-      const res = await fetch(`${API_BASE_URL}/profile/${encodeURIComponent(email)}`);
-      if (!res.ok) throw new Error("not found");
-      const user = await res.json();
+function switchAccount(){ window.location.href = 'login.html'; }
 
-      if (user.profileCompleted) {
-        showGenerateView(user);
-      }
-    } catch (err) {
-      // User nahi mila — profile form dikhta rahega, koi error nahi dikhana
-      console.log("No existing profile found, showing setup form.");
-    }
+// ===== Sidebar rendering =====
+function renderSidebar(activePage, user){
+  const mount = document.getElementById('sidebar-mount');
+  if (!mount) return;
+
+  const platItems = PLATFORMS.map(p => {
+    const connected = p.key === user.platform;
+    return `<div class="plat-item ${connected ? 'connected' : 'locked'}">
+      <span class="icon-badge ${p.cls}">${p.icon}</span>${p.key}
+      <span class="plat-count">${connected ? user.followers : 'Connect'}</span>
+    </div>`;
+  }).join('');
+
+  mount.innerHTML = `
+    <div class="brand">
+      <div class="logo">M</div>
+      <div class="brand-txt"><div>Menezo</div><div>Create · Build · Grow</div></div>
+    </div>
+    <nav>
+      <a class="dash-link ${activePage==='dashboard' ? 'active' : ''}" href="dashboard.html">🏠&nbsp; Dashboard</a>
+    </nav>
+    <div class="sec-label">Platforms</div>
+    <div id="platList">${platItems}</div>
+    <div class="sec-label">Tools</div>
+    <nav>
+      <a href="ai-studio.html">✨ AI Studio</a>
+      <a href="planner.html">📅 Content Planner</a>
+      <a href="caption-lab.html">🖼️ Caption Lab</a>
+      <a href="analytics.html">📊 Analytics</a>
+    </nav>
+    <div class="pro-card">
+      <b>👑 Menezo Pro</b>
+      Connect more platforms and unlock advanced AI tools.
+      <button class="pro-btn" onclick="alert('Coming soon!')">Upgrade Now</button>
+    </div>
+  `;
+}
+
+// ===== Topbar / avatar =====
+function renderTopbar(user){
+  const mount = document.getElementById('topbar-mount');
+  if (!mount) return;
+  const initial = (user.name || 'C').charAt(0).toUpperCase();
+  mount.innerHTML = `
+    <input class="search" placeholder="Search tools, projects, scripts...">
+    <div class="avatar" onclick="switchAccount()" title="Switch account">${initial}</div>
+  `;
+}
+
+// ===== Greeting time-of-day =====
+function greetingWord(){
+  const hour = new Date().getHours();
+  if (hour >= 5 && hour < 12) return 'Morning';
+  if (hour >= 12 && hour < 17) return 'Afternoon';
+  if (hour >= 17 && hour < 21) return 'Evening';
+  return 'Night';
+}
+
+// ===== Simple sparkline generator (for Platform Overview cards) =====
+function sparkPath(seed){
+  let pts = []; let v = 50;
+  for (let i=0; i<12; i++){
+    v += (Math.sin(seed+i)*14 + (Math.random()-0.5)*10);
+    v = Math.max(10, Math.min(90, v));
+    pts.push(v);
   }
+  const w=100, h=100, step=w/(pts.length-1);
+  return pts.map((p,i)=>`${i===0?'M':'L'} ${i*step} ${h-p}`).join(' ');
+}
 
-  function showGenerateView(user) {
-    profileCard.classList.add("hidden");
-    generateCard.classList.remove("hidden");
-    outputCard.classList.remove("hidden");
-    profileBadge.classList.remove("hidden");
-    profileBadgeText.textContent = `👋 ${user.profile?.name || user.email} • ${user.profile?.niche || "Creator"}`;
-  }
-
-  // ---------------------------------------------
-  // SAVE PROFILE
-  // ---------------------------------------------
-  saveProfileBtn.addEventListener("click", async () => {
-    const email = emailInput.value.trim();
-    const name = nameInput.value.trim();
-    const channel = channelInput.value.trim();
-    const platform = profilePlatformSelect.value;
-    const niche = nicheInput.value.trim();
-    const style = styleInput.value.trim();
-
-    profileError.textContent = "";
-
-    if (!email || !email.includes("@")) {
-      profileError.textContent = "⚠️ Please enter a valid email.";
-      return;
-    }
-    if (!name || !niche) {
-      profileError.textContent = "⚠️ Name aur Niche zaroori hai.";
-      return;
-    }
-
-    saveProfileBtn.disabled = true;
-    saveProfileBtn.textContent = "Saving...";
-
-    try {
-      // Step 1: login (naya user banega agar pehli baar hai)
-      await fetch(`${API_BASE_URL}/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-
-      // Step 2: profile save
-      const res = await fetch(`${API_BASE_URL}/save-profile`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, name, channel, platform, niche, style }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        profileError.textContent = `❌ ${data.error || "Kuch galat ho gaya."}`;
-        return;
-      }
-
-      localStorage.setItem("creatoros_email", email);
-      showGenerateView(data.user);
-    } catch (err) {
-      profileError.textContent = "❌ Server se connect nahi ho pa raha.";
-      console.error("Profile save failed:", err);
-    } finally {
-      saveProfileBtn.disabled = false;
-      saveProfileBtn.textContent = "Save Profile & Continue";
-    }
-  });
-
-  // ---------------------------------------------
-  // EDIT PROFILE — wapas form dikhane ke liye
-  // ---------------------------------------------
-  if (editProfileBtn) {
-    editProfileBtn.addEventListener("click", () => {
-      generateCard.classList.add("hidden");
-      outputCard.classList.add("hidden");
-      profileBadge.classList.add("hidden");
-      profileCard.classList.remove("hidden");
+// ===== AI chat call (shared, used by dashboard) =====
+async function askAIManager(message, user){
+  try {
+    const res = await fetch('/api/ai-manager-chat', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ message, creatorContext:{ name:user.name, handle:user.channelId, platform:user.platform, niche:user.niche } })
     });
+    const data = await res.json();
+    return data.reply || 'Focus on high-retention hooks and post consistently!';
+  } catch(err){
+    return 'Focus on high-retention hooks and post consistently!';
   }
-
-  // ---------------------------------------------
-  // GENERATE CONTENT
-  // ---------------------------------------------
-  if (generateBtn) {
-    generateBtn.addEventListener("click", async () => {
-      const email = localStorage.getItem("creatoros_email");
-      const topic = topicInput.value.trim();
-
-      if (!email) {
-        outputBox.innerHTML = "⚠️ Pehle profile set up karo.";
-        return;
-      }
-      if (!topic) {
-        outputBox.innerHTML = "⚠️ Pehle ek topic likho.";
-        return;
-      }
-
-      generateBtn.disabled = true;
-      generateBtn.textContent = "Generating...";
-      outputBox.innerHTML = "⏳ AI content generate kar rahi hai...";
-
-      try {
-        const response = await fetch(`${API_BASE_URL}/generate`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email,
-            topic,
-            platform: platformSelect.value,
-            contentType: contentTypeSelect.value,
-            language: languageSelect.value,
-          }),
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          outputBox.innerHTML = `❌ ${data.error || "Kuch galat ho gaya, dobara try karo."}`;
-          return;
-        }
-
-        outputBox.innerHTML = data.output.replace(/\n/g, "<br>");
-      } catch (err) {
-        outputBox.innerHTML = "❌ Server se connect nahi ho pa raha. Thodi der baad try karo.";
-        console.error("Generate request failed:", err);
-      } finally {
-        generateBtn.disabled = false;
-        generateBtn.textContent = "Generate Content";
-      }
-    });
-  }
-});
+}
