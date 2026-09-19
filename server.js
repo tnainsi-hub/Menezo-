@@ -1,4 +1,18 @@
-// AI generate route
+const express = require('express');
+const cors = require('cors');
+const path = require('path');
+const { GoogleGenAI } = require('@google/genai');
+require('dotenv').config();
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+app.use(express.static(__dirname));
+
+// Gemini initialize
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
+// AI Generate route
 app.post('/api/ai/generate', async (req, res) => {
   try {
     const { prompt, type, language } = req.body;
@@ -26,7 +40,7 @@ Format the response in clean Markdown with:
   }
 });
 
-// Dashboard AI Manager ke liye
+// AI Manager route (Dashboard ke liye)
 app.post('/api/ai-manager-chat', async (req, res) => {
   try {
     const { message, creatorContext } = req.body;
@@ -49,4 +63,14 @@ Question: ${message}`
     console.error('AI Manager Error:', error);
     res.status(500).json({ reply: 'AI temporarily unavailable. Try again.' });
   }
+});
+
+// Baaki pages ke liye
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`🚀 Menezo live on port ${PORT}`);
 });
