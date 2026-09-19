@@ -1,27 +1,4 @@
-const express = require('express');
-const cors = require('cors');
-const mongoose = require('mongoose');
-const path = require('path');
-const { GoogleGenAI } = require('@google/genai');
-require('dotenv').config();
-
-const app = express();
-app.use(cors());
-app.use(express.json());
-app.use(express.static(__dirname));
-
-// Initialize Gemini Client
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-
-// MongoDB Connection
-const MONGO_URI = process.env.MONGO_URI || process.env.MONGODB_URI;
-if (MONGO_URI) {
-  mongoose.connect(MONGO_URI)
-    .then(() => console.log('✅ MongoDB Connected successfully'))
-    .catch(err => console.log('MongoDB Warning:', err.message));
-}
-
-// AI Studio API Route
+// AI generate route
 app.post('/api/ai/generate', async (req, res) => {
   try {
     const { prompt, type, language } = req.body;
@@ -35,24 +12,41 @@ Language: ${language || 'English'}
 Prompt: ${prompt}
 
 Format the response in clean Markdown with:
-- 🎯 Hook (First 3 seconds)
-- 📝 Script / Body
-- 🎬 Visual & B-Roll Suggestions
-- 🚀 Call to Action (CTA)
-- 🏷️ Best 5 Hashtags`
+- 🎯 Hook
+- 📝 Script
+- 🎬 Visual Suggestions
+- 🚀 CTA
+- 🏷️ Hashtags`
     });
 
     res.json({ success: true, text: response.text });
   } catch (error) {
     console.error('AI Error:', error);
-    res.status(500).json({ success: false, error: error.message || 'AI generation failed' });
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 
-// Single Page Fallback (No 404 Crash)
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
-});
+// Dashboard AI Manager ke liye
+app.post('/api/ai-manager-chat', async (req, res) => {
+  try {
+    const { message, creatorContext } = req.body;
+    if (!message) return res.status(400).json({ error: 'Message required' });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 Menezo live on port ${PORT}`));
+    const context = creatorContext 
+      ? `Creator: ${creatorContext.name}, Platform: ${creatorContext.platform}, Niche: ${creatorContext.niche}`
+      : '';
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: `You are Menezo AI Manager. Give short and useful advice.
+${context}
+
+Question: ${message}`
+    });
+
+    res.json({ reply: response.text });
+  } catch (error) {
+    console.error('AI Manager Error:', error);
+    res.status(500).json({ reply: 'AI temporarily unavailable. Try again.' });
+  }
+});
