@@ -3,254 +3,180 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Menezo Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <title>Menezo — All-in-One Creator Operating System</title>
   <link rel="stylesheet" href="style.css">
-  <style>
-    .chat-box {
-      position: fixed;
-      bottom: 16px;
-      right: 16px;
-      width: 340px;
-      height: 440px;
-      background: #14101f;
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 16px;
-      display: none;
-      flex-direction: column;
-      z-index: 999;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-    }
-    .chat-header {
-      background: linear-gradient(135deg, #7c3aed, #ec4899);
-      padding: 12px 16px;
-      border-radius: 16px 16px 0 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-weight: 600;
-      color: white;
-    }
-    .chat-body {
-      flex: 1;
-      overflow-y: auto;
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .bubble {
-      max-width: 80%;
-      padding: 10px 12px;
-      border-radius: 12px;
-      font-size: 13.5px;
-      line-height: 1.4;
-    }
-    .bubble.user {
-      background: #7c3aed;
-      color: white;
-      align-self: flex-end;
-    }
-    .bubble.ai {
-      background: #1a1428;
-      border: 1px solid rgba(255,255,255,0.08);
-      align-self: flex-start;
-    }
-    .chat-footer {
-      display: flex;
-      gap: 8px;
-      padding: 10px;
-      border-top: 1px solid rgba(255,255,255,0.08);
-    }
-    .chat-footer input {
-      flex: 1;
-      background: #0c0916;
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 10px;
-      padding: 10px;
-      color: white;
-      font-size: 13.5px;
-    }
-    .chat-footer button {
-      background: #7c3aed;
-      border: none;
-      border-radius: 10px;
-      color: white;
-      padding: 0 14px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-  </style>
 </head>
 <body>
-  <div class="app">
-    <aside id="sidebar-mount"></aside>
 
-    <main>
-      <div class="topbar" id="topbar-mount"></div>
-
-      <div class="hero">
-        <div class="hero-inner">
-          <h1>Good <span id="greetTime">Day</span>, <span id="displayName">Creator</span> 👋</h1>
-          <p>
-            <span id="displayHandle">@you</span> · 
-            <span id="displayPlatform">YouTube</span> · 
-            <span id="displayNiche">General</span>
-          </p>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div>
+      <div class="brand-logo">
+        <div class="logo-icon">M</div>
+        <div>
+          <div class="logo-text">Menezo</div>
+          <div class="tagline">Create · Build · Grow</div>
         </div>
       </div>
 
-      <!-- Stats -->
-      <div class="stat-row" id="statRow" style="display:flex; gap:12px; margin-bottom:20px; flex-wrap:wrap;"></div>
+      <div class="nav-section">
+        <div class="nav-heading">Main</div>
+        <a class="nav-link active" id="nav-dashboard" onclick="switchAITool('script')">⚡ Dashboard</a>
+      </div>
 
-      <!-- Platform Overview -->
-      <div class="section-title"><h2>Platform Overview</h2></div>
-      <div class="overview-grid" id="overviewGrid"></div>
+      <div class="nav-section">
+        <div class="nav-heading">AI Studio Tools</div>
+        <a class="nav-link" id="nav-script" onclick="switchAITool('script')">📝 Script Lab</a>
+        <a class="nav-link" id="nav-hooks" onclick="switchAITool('hooks')">🪝 Viral Hook Finder</a>
+        <a class="nav-link" id="nav-reply" onclick="switchAITool('reply')">💬 AI Reply Pro</a>
+        <a class="nav-link" id="nav-repurpose" onclick="switchAITool('repurpose')">🔄 Content Repurposer</a>
+        <a class="nav-link" id="nav-seo_tags" onclick="switchAITool('seo_tags')">🏷️ SEO & Tag Finder</a>
+        <a class="nav-link" id="nav-thumbnail" onclick="switchAITool('thumbnail')">🖼️ Thumbnail Prompt</a>
+      </div>
 
-      <!-- Today's Focus + Inspiration -->
-      <div class="bottom-grid">
-        <div class="card">
-          <h3>Today's Focus</h3>
-          <div id="taskList"></div>
-          <div class="addtask">
-            <input type="text" id="newTaskInput" placeholder="Add a task...">
-            <button onclick="addTask()">Add</button>
+      <div class="nav-section">
+        <div class="nav-heading">Platforms</div>
+        <a class="nav-link" onclick="openPlatformModal()">⚙️ Edit Creator Profile & Stats</a>
+      </div>
+    </div>
+
+    <div class="pro-card">
+      <h4>👑 Menezo Pro</h4>
+      <p>Unlimited scripts & multi-channel sync</p>
+      <button class="btn-pro">Upgrade Plan</button>
+    </div>
+  </aside>
+
+  <!-- Main Area -->
+  <main class="main-wrapper">
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="search-bar">
+        <span>🔍</span>
+        <input type="text" placeholder="Search scripts, hooks, saved assets...">
+      </div>
+
+      <div class="user-profile" onclick="openPlatformModal()" style="cursor: pointer;">
+        <div class="avatar" id="avatarLetter">T</div>
+        <div>
+          <div id="creatorDisplayName" style="font-weight: 700; font-size: 14px;">Creator</div>
+          <div style="font-size: 11px; color: var(--text-muted);">Menezo Creator OS ▾</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <div class="dashboard-content">
+      <!-- Welcome Banner -->
+      <section class="welcome-banner">
+        <div>
+          <h1 id="welcomeGreeting">Good Day, Creator! 👋</h1>
+          <p style="color: var(--text-muted); font-size: 14px;">Your AI-powered content workspace is ready.</p>
+        </div>
+        <button class="btn-pro" style="width: auto; padding: 10px 20px;" onclick="switchAITool('script')">✨ Create New Script</button>
+      </section>
+
+      <!-- Stats Grid -->
+      <section class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-header"><span>Total Audience</span> 👥</div>
+          <div class="stat-value" id="statFollowers">125K</div>
+          <div class="stat-growth">↑ 12% vs last 7 days</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-header"><span>Total Views</span> 👁️</div>
+          <div class="stat-value" id="statViews">8.7M</div>
+          <div class="stat-growth">↑ 18% vs last 7 days</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-header"><span>Engagement Rate</span> 🔥</div>
+          <div class="stat-value" id="statEngagement">8.3%</div>
+          <div class="stat-growth">↑ 9% vs last 7 days</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-header"><span>Daily Goal</span> 🎯</div>
+          <div class="stat-value">75%</div>
+          <div class="stat-growth" style="color: var(--accent-purple);">Keep going!</div>
+        </div>
+      </section>
+
+      <!-- Platforms Overview -->
+      <section>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <h3 style="font-size: 15px;">Platform Overview</h3>
+          <span onclick="openPlatformModal()" style="font-size: 12px; color: var(--accent-purple); cursor: pointer;">+ Update Numbers</span>
+        </div>
+        <div class="platforms-scroll" id="platformsContainer"></div>
+      </section>
+
+      <!-- 2-Column: AI Interactive Studio & Focus/History -->
+      <div class="grid-2-col">
+        <!-- AI Studio Box -->
+        <section class="card-box">
+          <div class="box-title">
+            <span id="aiToolHeading">📝 Script Lab (Viral Retention)</span>
+            <span style="font-size: 12px; color: var(--accent-purple);">Gemini 2.5 Flash</span>
           </div>
-        </div>
 
-        <div class="card">
-          <h3>Inspiration</h3>
-          <div id="insightList"></div>
+          <div id="aiInputSection">
+            <div class="ai-form-group" id="topicInputGroup">
+              <label>Topic / Concept / Idea</label>
+              <input type="text" id="aiTopic" class="ai-input" placeholder="e.g. 5 AI tools that will save you 10 hours a week">
+            </div>
+
+            <div class="ai-form-group" id="platformSelectGroup">
+              <label>Target Format & Tone</label>
+              <select id="aiPlatform" class="ai-select" style="margin-bottom: 8px;">
+                <option value="Instagram Reel / YouTube Shorts (60s)">Reel / Shorts (60s Vertical)</option>
+                <option value="Long Form YouTube Video (5-10 Mins)">Long-form YouTube Video</option>
+                <option value="TikTok Viral Fast-Cut">TikTok Fast-Cut</option>
+              </select>
+              <select id="aiTone" class="ai-select">
+                <option value="High Energy, Fast-Paced & Engaging">High Energy & Engaging</option>
+                <option value="Professional, Insightful & Authoritative">Professional & Insightful</option>
+                <option value="Storytelling & Relatable">Storytelling & Relatable</option>
+                <option value="Casual & Humorous">Casual & Humorous</option>
+              </select>
+            </div>
+
+            <div class="ai-form-group" id="commentReplyGroup" style="display: none;">
+              <label>Audience Comment / DM to Reply to</label>
+              <textarea id="aiComment" class="ai-textarea" placeholder="Paste the audience comment here to get 3 brand-ready, high-retention replies..."></textarea>
+            </div>
+
+            <button class="btn-generate" id="btnGenerate" onclick="generateAIContent()">⚡ Generate Viral Script</button>
+          </div>
+
+          <!-- AI Output Card -->
+          <div class="ai-output-box" id="aiOutput" style="display: none;"></div>
+        </section>
+
+        <!-- Right Side: Focus & MongoDB History -->
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+          <!-- Tasks Box -->
+          <section class="card-box">
+            <div class="box-title">
+              <span>🎯 Today's Focus</span>
+              <button onclick="addTaskPrompt()" style="background: none; border: none; color: var(--accent-purple); cursor: pointer; font-weight: 600;">+ Add</button>
+            </div>
+            <div id="taskList"></div>
+          </section>
+
+          <!-- Saved History Box (Direct from MongoDB) -->
+          <section class="card-box">
+            <div class="box-title">
+              <span>🍃 MongoDB Saved History</span>
+              <span onclick="fetchRecentHistory()" style="font-size: 11px; color: var(--text-muted); cursor: pointer;">🔄 Refresh</span>
+            </div>
+            <div id="historyList">
+              <div style="font-size: 12px; color: var(--text-muted);">Fetching history...</div>
+            </div>
+          </section>
         </div>
       </div>
-
-      <!-- Quick Actions -->
-      <div class="section-title"><h2>Quick Actions</h2></div>
-      <div class="quick-grid">
-        <div class="quick-item" onclick="openChat()">🤖 AI Chat</div>
-        <div class="quick-item" onclick="alert('Coming soon')">📝 Script</div>
-        <div class="quick-item" onclick="alert('Coming soon')">✨ Caption</div>
-        <div class="quick-item" onclick="alert('Coming soon')">🖼️ Thumbnail</div>
-      </div>
-    </main>
-  </div>
-
-  <!-- AI Chat -->
-  <div class="chat-box" id="chatBox">
-    <div class="chat-header">
-      <span>Menezo AI</span>
-      <span onclick="closeChat()" style="cursor:pointer;font-size:20px;">×</span>
     </div>
-    <div class="chat-body" id="chatBody">
-      <div class="bubble ai">Hi! Main Menezo AI hoon. Script, title, ideas ya growth tips chahiye?</div>
-    </div>
-    <div class="chat-footer">
-      <input type="text" id="chatInput" placeholder="Type here..." onkeydown="if(event.key==='Enter')sendMessage()">
-      <button onclick="sendMessage()">Send</button>
-    </div>
-  </div>
+  </main>
 
   <script src="app.js"></script>
-  <script>
-    const user = requireLogin();
-    if (!user) throw "Not logged in";
-
-    // Fill header
-    document.getElementById('displayName').textContent = user.name || 'Creator';
-    document.getElementById('displayHandle').textContent = user.channelId || '@you';
-    document.getElementById('displayPlatform').textContent = user.platform || 'YouTube';
-    document.getElementById('displayNiche').textContent = user.niche || 'General';
-    document.getElementById('greetTime').textContent = greetingWord();
-
-    renderSidebar('dashboard', user);
-    renderTopbar(user);
-
-    // Stats
-    document.getElementById('statRow').innerHTML = `
-      <div class="stat"><div class="lbl">Followers</div><div class="num">${user.followers || '0'}</div></div>
-      <div class="stat"><div class="lbl">Score</div><div class="num">${user.score || 50}</div></div>
-    `;
-
-    // Platforms
-    document.getElementById('overviewGrid').innerHTML = PLATFORMS.slice(0,4).map(p => {
-      const connected = p.key === user.platform;
-      return `
-        <div class="ov-card ${connected ? 'connected' : 'locked'}">
-          <div class="ov-head">
-            <span class="icon-badge \( {p.cls}"> \){p.icon}</span> ${p.key}
-          </div>
-          <div class="ov-num">${connected ? (user.followers || '0') : '—'}</div>
-          <div class="ov-lbl">${connected ? 'Followers' : 'Not connected'}</div>
-        </div>
-      `;
-    }).join('');
-
-    // Tasks
-    let tasks = JSON.parse(localStorage.getItem('menezo_tasks') || 'null') || [
-      { text: "Finish today's script", done: false },
-      { text: "Reply to comments", done: false }
-    ];
-
-    function renderTasks() {
-      document.getElementById('taskList').innerHTML = tasks.map((t, i) => `
-        <div class="task \( {t.done ? 'done' : ''}" onclick="toggleTask( \){i})">
-          <span>${t.text}</span>
-          <span>${t.done ? '✓' : ''}</span>
-        </div>
-      `).join('');
-    }
-    window.toggleTask = function(i) {
-      tasks[i].done = !tasks[i].done;
-      localStorage.setItem('menezo_tasks', JSON.stringify(tasks));
-      renderTasks();
-    };
-    window.addTask = function() {
-      const val = document.getElementById('newTaskInput').value.trim();
-      if (!val) return;
-      tasks.push({ text: val, done: false });
-      document.getElementById('newTaskInput').value = '';
-      localStorage.setItem('menezo_tasks', JSON.stringify(tasks));
-      renderTasks();
-    };
-    renderTasks();
-
-    // Insights
-    document.getElementById('insightList').innerHTML = `
-      <div class="insight"><span>↗ Emotional storytelling</span><span class="tag high">High</span></div>
-      <div class="insight"><span>↗ Day in the life content</span><span class="tag rising">Rising</span></div>
-      <div class="insight"><span>↗ Behind the scenes</span><span class="tag high">High</span></div>
-    `;
-
-    // Chat functions
-    function openChat() {
-      document.getElementById('chatBox').style.display = 'flex';
-    }
-    function closeChat() {
-      document.getElementById('chatBox').style.display = 'none';
-    }
-    async function sendMessage() {
-      const input = document.getElementById('chatInput');
-      const text = input.value.trim();
-      if (!text) return;
-
-      const body = document.getElementById('chatBody');
-      body.innerHTML += `<div class="bubble user">${text}</div>`;
-      input.value = '';
-      body.scrollTop = body.scrollHeight;
-
-      body.innerHTML += `<div class="bubble ai" id="loading">Thinking...</div>`;
-      body.scrollTop = body.scrollHeight;
-
-      try {
-        const reply = await askAIManager(text, user);
-        document.getElementById('loading').remove();
-        body.innerHTML += `<div class="bubble ai">${reply}</div>`;
-      } catch (e) {
-        document.getElementById('loading').remove();
-        body.innerHTML += `<div class="bubble ai">AI temporarily unavailable. Try again.</div>`;
-      }
-      body.scrollTop = body.scrollHeight;
-    }
-  </script>
 </body>
 </html>
