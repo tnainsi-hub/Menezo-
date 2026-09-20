@@ -4,28 +4,105 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Menezo — Dashboard</title>
-<meta name="description" content="Your Menezo creator dashboard — tasks, AI insights, and platform growth in one place.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<style>
+  .chat-panel {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 340px;
+    max-height: 460px;
+    background: #13111c;
+    border: 1px solid #2e2a3d;
+    border-radius: 18px;
+    display: none;
+    flex-direction: column;
+    z-index: 1000;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  }
+  .chat-header {
+    padding: 14px 16px;
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    border-radius: 18px 18px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 700;
+  }
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 320px;
+  }
+  .msg {
+    padding: 10px 13px;
+    border-radius: 12px;
+    font-size: 13.5px;
+    line-height: 1.45;
+    max-width: 90%;
+  }
+  .msg.user {
+    background: #7c3aed;
+    align-self: flex-end;
+  }
+  .msg.ai {
+    background: #1e1b2e;
+    border: 1px solid #2e2a3d;
+    align-self: flex-start;
+  }
+  .chat-input-area {
+    display: flex;
+    gap: 8px;
+    padding: 12px;
+    border-top: 1px solid #2e2a3d;
+  }
+  .chat-input-area input {
+    flex: 1;
+    background: #0c0916;
+    border: 1px solid #2e2a3d;
+    border-radius: 10px;
+    padding: 10px 12px;
+    color: white;
+    font-size: 13.5px;
+  }
+  .chat-input-area button {
+    background: #7c3aed;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    padding: 0 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .close-chat {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+  }
+</style>
 </head>
 <body>
-
 <div class="app">
   <aside id="sidebar-mount"></aside>
-
   <main>
     <div class="topbar" id="topbar-mount"></div>
 
     <div class="hero">
       <div class="hero-inner">
-        <h1>Good <span id="greetTime">Evening</span>, <span id="displayName">Creator</span>! 👋 <a class="switch-link" href="login.html">switch</a></h1>
+        <h1>Good <span id="greetTime">Evening</span>, <span id="displayName">Creator</span>! 👋</h1>
         <p><span id="displayHandle">@you</span> · <span id="displayPlatform">YouTube</span> · <span id="displayNiche">General</span></p>
         <div class="stat-row" id="statRow"></div>
       </div>
     </div>
 
-    <div class="section-title"><h2>Platform Overview</h2><a href="#">View All →</a></div>
+    <div class="section-title"><h2>Platform Overview</h2></div>
     <div class="overview-grid" id="overviewGrid"></div>
 
     <div class="bottom-grid">
@@ -47,19 +124,19 @@
         <h3>Creator Wellness</h3>
         <div class="ring">☕</div>
         <div class="focus-num" id="focusHrs">2.5 hrs.</div>
-        <div class="focus-lbl">Focused today — take a 10-min break!</div>
+        <div class="focus-lbl">Focused today — take a short break!</div>
         <button onclick="startBreak()">Start Break Timer</button>
       </div>
     </div>
 
     <div class="section-title"><h2>Quick Actions</h2></div>
     <div class="quick-grid">
-      <div class="quick-item" onclick="location.href='ai-studio.html'"><div class="qi-icon">📝</div>Write Script</div>
-      <div class="quick-item" onclick="location.href='caption-lab.html'"><div class="qi-icon">✨</div>Caption</div>
-      <div class="quick-item" onclick="location.href='ai-studio.html'"><div class="qi-icon">🖼️</div>Thumbnail</div>
-      <div class="quick-item" onclick="location.href='planner.html'"><div class="qi-icon">📅</div>Plan Content</div>
-      <div class="quick-item" onclick="askAndShow()"><div class="qi-icon">🤖</div>AI Chat</div>
-      <div class="quick-item" onclick="location.href='analytics.html'"><div class="qi-icon">📊</div>Analytics</div>
+      <div class="quick-item" onclick="openChat()">🤖 AI Chat</div>
+      <div class="quick-item" onclick="alert('Coming soon')">📝 Write Script</div>
+      <div class="quick-item" onclick="alert('Coming soon')">✨ Caption</div>
+      <div class="quick-item" onclick="alert('Coming soon')">🖼️ Thumbnail</div>
+      <div class="quick-item" onclick="alert('Coming soon')">📅 Planner</div>
+      <div class="quick-item" onclick="alert('Coming soon')">📊 Analytics</div>
     </div>
 
     <div class="footer-strip">
@@ -68,52 +145,64 @@
   </main>
 </div>
 
+<!-- AI Chat Panel -->
+<div class="chat-panel" id="chatPanel">
+  <div class="chat-header">
+    <span>Menezo AI</span>
+    <button class="close-chat" onclick="closeChat()">×</button>
+  </div>
+  <div class="chat-messages" id="chatMessages">
+    <div class="msg ai">Hi! Main Menezo AI hoon. Aaj kis cheez mein help chahiye? (script, title, ideas...)</div>
+  </div>
+  <div class="chat-input-area">
+    <input type="text" id="chatInput" placeholder="Type your message..." onkeydown="if(event.key==='Enter') sendChat()">
+    <button onclick="sendChat()">Send</button>
+  </div>
+</div>
+
 <script src="app.js"></script>
 <script>
   const user = requireLogin();
   if (user) {
-
     renderSidebar('dashboard', user);
     renderTopbar(user);
 
-    const first = (user.name || 'Creator').split(' ')[0];
-    document.getElementById('displayName').textContent = first;
-    document.getElementById('displayHandle').textContent = user.channelId;
-    document.getElementById('displayPlatform').textContent = user.platform;
-    document.getElementById('displayNiche').textContent = user.niche;
+    document.getElementById('displayName').textContent = user.name || 'Creator';
+    document.getElementById('displayHandle').textContent = user.channelId || '@you';
+    document.getElementById('displayPlatform').textContent = user.platform || 'YouTube';
+    document.getElementById('displayNiche').textContent = user.niche || 'General';
     document.getElementById('greetTime').textContent = greetingWord();
 
+    // Stats
     document.getElementById('statRow').innerHTML = `
-      <div class="stat"><div class="lbl">Followers</div><div class="num">${user.followers}</div><div class="delta">On ${user.platform}</div></div>
-      <div class="stat"><div class="lbl">Creator Score</div><div class="num">${user.score || 50}</div><div class="delta">↑ Building momentum</div></div>
-      <div class="stat"><div class="lbl">Tasks Today</div><div class="num" id="statTasks">0</div><div class="delta" id="statTasksDone">0 done</div></div>
+      <div class="stat"><div class="lbl">Followers</div><div class="num">${user.followers || '0'}</div></div>
+      <div class="stat"><div class="lbl">Creator Score</div><div class="num">${user.score || 50}</div></div>
+      <div class="stat"><div class="lbl">Tasks Today</div><div class="num" id="statTasks">0</div></div>
     `;
 
-    document.getElementById('overviewGrid').innerHTML = PLATFORMS.slice(0,4).map((p,i) => {
+    // Platform Overview
+    document.getElementById('overviewGrid').innerHTML = PLATFORMS.slice(0,4).map(p => {
       const connected = p.key === user.platform;
-      const path = sparkPath(i*2);
-      return `<div class="ov-card ${connected?'connected':'locked'}">
-        ${!connected ? '<span class="ov-locked-tag">Connect</span>' : ''}
-        <div class="ov-head"><span class="icon-badge ${p.cls}">${p.icon}</span>${p.key}</div>
+      return `<div class="ov-card ${connected ? 'connected' : 'locked'}">
+        <div class="ov-head"><span class="icon-badge \( {p.cls}"> \){p.icon}</span> ${p.key}</div>
         <div class="ov-num">${connected ? user.followers : '—'}</div>
         <div class="ov-lbl">${connected ? 'Followers' : 'Not connected'}</div>
-        ${connected ? `<svg class="spark" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="${path}" fill="none" stroke="#a78bfa" stroke-width="4"/></svg>` : ''}
       </div>`;
     }).join('');
 
+    // Tasks
     let tasks = JSON.parse(localStorage.getItem('menezo_tasks') || 'null') || [
-      { text:"Finish today's script", done:false },
-      { text:'Reply to top comments', done:false },
-      { text:'Plan next upload', done:false },
+      { text: "Finish today's script", done: false },
+      { text: 'Reply to top comments', done: false },
+      { text: 'Plan next upload', done: false },
     ];
     function saveTasks(){ localStorage.setItem('menezo_tasks', JSON.stringify(tasks)); renderTasks(); }
     function renderTasks(){
       document.getElementById('taskList').innerHTML = tasks.map((t,i) => `
-        <div class="task ${t.done?'done':''}" onclick="toggleTask(${i})">
-          <span>${t.text}</span><span class="time">${t.done?'✓':''}</span>
+        <div class="task \( {t.done?'done':''}" onclick="toggleTask( \){i})">
+          <span>\( {t.text}</span><span> \){t.done?'✓':''}</span>
         </div>`).join('');
       document.getElementById('statTasks').textContent = tasks.length;
-      document.getElementById('statTasksDone').textContent = tasks.filter(t=>t.done).length + ' done';
     }
     window.toggleTask = function(i){ tasks[i].done = !tasks[i].done; saveTasks(); };
     window.addTask = function(){
@@ -126,27 +215,53 @@
     };
     renderTasks();
 
-    const insights = [
+    // Insights
+    document.getElementById('insightList').innerHTML = [
       ['Emotional storytelling with a twist', 'high'],
       [`Day in the life — ${user.niche} edition`, 'rising'],
       ['Behind the scenes is winning', 'high'],
-      ['Relatable struggles for young creators', 'rising'],
-    ];
-    document.getElementById('insightList').innerHTML = insights.map(([text, level]) => `
+    ].map(([text, level]) => `
       <div class="insight">
         <span>↗ ${text}</span>
-        <span class="tag ${level}">${level === 'high' ? 'High Opportunity' : 'Rising'}</span>
+        <span class="tag \( {level}"> \){level === 'high' ? 'High Opportunity' : 'Rising'}</span>
       </div>`).join('');
 
-    window.startBreak = function(){ alert('Break timer started — see you in 10 minutes!'); };
-    window.askAndShow = async function(){
-      const q = prompt('Ask your AI manager anything:');
-      if (!q) return;
-      const reply = await askAIManager(q, user);
-      alert(reply);
-    };
+    window.startBreak = function(){ alert('Break timer started — 10 minutes!'); };
+  }
+
+  // ===== AI Chat Functions =====
+  function openChat() {
+    document.getElementById('chatPanel').style.display = 'flex';
+  }
+  function closeChat() {
+    document.getElementById('chatPanel').style.display = 'none';
+  }
+  async function sendChat() {
+    const input = document.getElementById('chatInput');
+    const msg = input.value.trim();
+    if (!msg) return;
+
+    const messagesDiv = document.getElementById('chatMessages');
+    
+    // User message
+    messagesDiv.innerHTML += `<div class="msg user">${msg}</div>`;
+    input.value = '';
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+    // Loading
+    messagesDiv.innerHTML += `<div class="msg ai" id="loading">Thinking...</div>`;
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+    try {
+      const reply = await askAIManager(msg, user);
+      document.getElementById('loading').remove();
+      messagesDiv.innerHTML += `<div class="msg ai">${reply}</div>`;
+    } catch (e) {
+      document.getElementById('loading').remove();
+      messagesDiv.innerHTML += `<div class="msg ai">Sorry, AI is temporarily unavailable. Try again.</div>`;
+    }
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
   }
 </script>
-
 </body>
 </html>
