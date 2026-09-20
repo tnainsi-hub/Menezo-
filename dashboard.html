@@ -2,181 +2,619 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Menezo — All-in-One Creator Operating System</title>
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Menezo — Creator Operating System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-dark: #090810;
+      --bg-card: rgba(22, 18, 38, 0.85);
+      --bg-card-glass: rgba(255, 255, 255, 0.04);
+      --border-card: rgba(255, 255, 255, 0.08);
+      --border-glow: rgba(168, 85, 247, 0.4);
+      --primary-purple: #8b5cf6;
+      --primary-pink: #ec4899;
+      --accent-cyan: #06b6d4;
+      --accent-green: #10b981;
+      --text-white: #ffffff;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-white);
+      display: flex;
+      min-height: 100vh;
+      overflow-x: hidden;
+      padding-bottom: 75px; /* Mobile App nav space */
+    }
+
+    /* Desktop Sidebar (Auto-hides on Mobile like native apps) */
+    .app-sidebar {
+      width: 250px;
+      background: #110d22;
+      border-right: 1px solid var(--border-card);
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .brand-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 30px;
+    }
+
+    .brand-logo-badge {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #a855f7, #ec4899);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 20px;
+      box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
+    }
+
+    .brand-title {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .sidebar-menu-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 10px;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s;
+    }
+
+    .sidebar-menu-btn.active, .sidebar-menu-btn:hover {
+      background: rgba(139, 92, 246, 0.15);
+      color: #fff;
+    }
+
+    /* Main Container */
+    .app-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* App Header / Topbar */
+    .app-topbar {
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-card);
+      background: rgba(9, 8, 16, 0.85);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .creator-profile-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg-card-glass);
+      border: 1px solid var(--border-card);
+      padding: 6px 14px;
+      border-radius: 30px;
+      cursor: pointer;
+    }
+
+    .creator-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #8b5cf6, #ec4899);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    /* Content Area */
+    .app-content {
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    /* Hero Banner Card */
+    .hero-card {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.25), rgba(236, 72, 153, 0.1)), #17132a;
+      border: 1px solid var(--border-glow);
+      border-radius: 18px;
+      padding: 22px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card h2 {
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .hero-card p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* Metric Grid (Instagram/YouTube style metrics) */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    @media (min-width: 768px) {
+      .metrics-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+
+    .metric-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .metric-card .title {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .metric-card .value {
+      font-size: 22px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .metric-card .growth {
+      font-size: 11px;
+      color: var(--accent-green);
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    /* Horizontal Platform Scroll */
+    .platform-slider {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: none;
+    }
+
+    .platform-slider::-webkit-scrollbar { display: none; }
+
+    .platform-card {
+      min-width: 140px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: 14px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    /* Interactive AI Studio Workspace */
+    .studio-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: 18px;
+      padding: 20px;
+    }
+
+    .tool-selector-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .tool-btn {
+      background: var(--bg-card-glass);
+      border: 1px solid var(--border-card);
+      color: var(--text-muted);
+      padding: 10px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 700;
+      text-align: center;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s;
+    }
+
+    .tool-btn.active {
+      background: rgba(139, 92, 246, 0.2);
+      border-color: var(--primary-purple);
+      color: #fff;
+    }
+
+    .app-input, .app-select, .app-textarea {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid var(--border-card);
+      color: #fff;
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      outline: none;
+      margin-bottom: 12px;
+    }
+
+    .app-input:focus, .app-textarea:focus {
+      border-color: var(--primary-purple);
+    }
+
+    .btn-action-primary {
+      width: 100%;
+      background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+      color: #fff;
+      border: none;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+    }
+
+    .output-card {
+      margin-top: 14px;
+      background: rgba(10, 8, 20, 0.95);
+      border: 1px solid var(--border-glow);
+      border-radius: 14px;
+      padding: 16px;
+      font-size: 13px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
+    /* Mobile Bottom Navigation (Instagram Style) */
+    .mobile-navbar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 65px;
+      background: rgba(13, 10, 26, 0.95);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid var(--border-card);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 100;
+    }
+
+    .nav-tab-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-muted);
+      font-size: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+
+    .nav-tab-item.active {
+      color: var(--primary-purple);
+    }
+
+    .nav-tab-item span.icon {
+      font-size: 18px;
+    }
+
+    /* Responsiveness */
+    @media (max-width: 768px) {
+      .app-sidebar { display: none; }
+    }
+    @media (min-width: 769px) {
+      .mobile-navbar { display: none; }
+      body { padding-bottom: 0; }
+    }
+  </style>
 </head>
 <body>
 
-  <!-- Sidebar -->
-  <aside class="sidebar">
+  <!-- Desktop App Sidebar -->
+  <aside class="app-sidebar">
     <div>
-      <div class="brand-logo">
-        <div class="logo-icon">M</div>
+      <div class="brand-header">
+        <div class="brand-logo-badge">M</div>
         <div>
-          <div class="logo-text">Menezo</div>
-          <div class="tagline">Create · Build · Grow</div>
+          <div class="brand-title">Menezo</div>
+          <div style="font-size: 10px; color: var(--text-muted); letter-spacing: 0.5px;">CREATOR OS</div>
         </div>
       </div>
 
-      <div class="nav-section">
-        <div class="nav-heading">Main</div>
-        <a class="nav-link active" id="nav-dashboard" onclick="switchAITool('script')">⚡ Dashboard</a>
-      </div>
-
-      <div class="nav-section">
-        <div class="nav-heading">AI Studio Tools</div>
-        <a class="nav-link" id="nav-script" onclick="switchAITool('script')">📝 Script Lab</a>
-        <a class="nav-link" id="nav-hooks" onclick="switchAITool('hooks')">🪝 Viral Hook Finder</a>
-        <a class="nav-link" id="nav-reply" onclick="switchAITool('reply')">💬 AI Reply Pro</a>
-        <a class="nav-link" id="nav-repurpose" onclick="switchAITool('repurpose')">🔄 Content Repurposer</a>
-        <a class="nav-link" id="nav-seo_tags" onclick="switchAITool('seo_tags')">🏷️ SEO & Tag Finder</a>
-        <a class="nav-link" id="nav-thumbnail" onclick="switchAITool('thumbnail')">🖼️ Thumbnail Prompt</a>
-      </div>
-
-      <div class="nav-section">
-        <div class="nav-heading">Platforms</div>
-        <a class="nav-link" onclick="openPlatformModal()">⚙️ Edit Creator Profile & Stats</a>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <button class="sidebar-menu-btn active" onclick="scrollToSection('studio-section')">⚡ AI Studio</button>
+        <button class="sidebar-menu-btn" onclick="scrollToSection('metrics-section')">📊 Analytics</button>
+        <button class="sidebar-menu-btn" onclick="scrollToSection('tasks-section')">🎯 Today's Tasks</button>
+        <button class="sidebar-menu-btn" onclick="openProfileModal()">⚙️ Edit Profile Stats</button>
       </div>
     </div>
 
-    <div class="pro-card">
-      <h4>👑 Menezo Pro</h4>
-      <p>Unlimited scripts & multi-channel sync</p>
-      <button class="btn-pro">Upgrade Plan</button>
+    <div style="background: rgba(139, 92, 246, 0.1); border: 1px solid var(--border-glow); padding: 14px; border-radius: 12px; text-align: center;">
+      <div style="font-size: 13px; font-weight: 700; margin-bottom: 4px;">👑 Menezo Pro</div>
+      <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">Scale your workflow</div>
+      <button class="btn-action-primary" style="padding: 8px; font-size: 12px;">Upgrade</button>
     </div>
   </aside>
 
-  <!-- Main Area -->
-  <main class="main-wrapper">
+  <!-- App Main Window -->
+  <main class="app-main">
     <!-- Topbar -->
-    <header class="topbar">
-      <div class="search-bar">
-        <span>🔍</span>
-        <input type="text" placeholder="Search scripts, hooks, saved assets...">
+    <header class="app-topbar">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <div class="brand-logo-badge" style="width: 32px; height: 32px; font-size: 16px;">M</div>
+        <div style="font-weight: 800; font-size: 16px;">Menezo</div>
       </div>
 
-      <div class="user-profile" onclick="openPlatformModal()" style="cursor: pointer;">
-        <div class="avatar" id="avatarLetter">T</div>
-        <div>
-          <div id="creatorDisplayName" style="font-weight: 700; font-size: 14px;">Creator</div>
-          <div style="font-size: 11px; color: var(--text-muted);">Menezo Creator OS ▾</div>
-        </div>
+      <div class="creator-profile-pill" onclick="openProfileModal()">
+        <div class="creator-avatar" id="avatarLetter">T</div>
+        <span id="creatorNameTop" style="font-size: 12px; font-weight: 700;">Tanu</span>
+        <span style="font-size: 10px; color: var(--text-muted);">▾</span>
       </div>
     </header>
 
-    <!-- Content -->
-    <div class="dashboard-content">
-      <!-- Welcome Banner -->
-      <section class="welcome-banner">
-        <div>
-          <h1 id="welcomeGreeting">Good Day, Creator! 👋</h1>
-          <p style="color: var(--text-muted); font-size: 14px;">Your AI-powered content workspace is ready.</p>
-        </div>
-        <button class="btn-pro" style="width: auto; padding: 10px 20px;" onclick="switchAITool('script')">✨ Create New Script</button>
+    <!-- Main Mobile Content -->
+    <div class="app-content">
+      <!-- Welcome Hero Banner -->
+      <section class="hero-card">
+        <h2 id="greetingTitle">Good Day, Tanu! 👋</h2>
+        <p>Your Creator Studio is live & connected.</p>
       </section>
 
-      <!-- Stats Grid -->
-      <section class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-header"><span>Total Audience</span> 👥</div>
-          <div class="stat-value" id="statFollowers">125K</div>
-          <div class="stat-growth">↑ 12% vs last 7 days</div>
+      <!-- Metrics Row -->
+      <section class="metrics-grid" id="metrics-section">
+        <div class="metric-card">
+          <div class="title">Total Reach 👥</div>
+          <div class="value" id="statFollowers">125K</div>
+          <div class="growth">↑ 14% this week</div>
         </div>
-        <div class="stat-card">
-          <div class="stat-header"><span>Total Views</span> 👁️</div>
-          <div class="stat-value" id="statViews">8.7M</div>
-          <div class="stat-growth">↑ 18% vs last 7 days</div>
+        <div class="metric-card">
+          <div class="title">Total Views 👁️</div>
+          <div class="value" id="statViews">8.7M</div>
+          <div class="growth">↑ 22% growth</div>
         </div>
-        <div class="stat-card">
-          <div class="stat-header"><span>Engagement Rate</span> 🔥</div>
-          <div class="stat-value" id="statEngagement">8.3%</div>
-          <div class="stat-growth">↑ 9% vs last 7 days</div>
+        <div class="metric-card">
+          <div class="title">Avg Engagement 🔥</div>
+          <div class="value" id="statEngagement">8.3%</div>
+          <div class="growth">High Retention</div>
         </div>
-        <div class="stat-card">
-          <div class="stat-header"><span>Daily Goal</span> 🎯</div>
-          <div class="stat-value">75%</div>
-          <div class="stat-growth" style="color: var(--accent-purple);">Keep going!</div>
+        <div class="metric-card">
+          <div class="title">Daily Goal 🎯</div>
+          <div class="value">80%</div>
+          <div class="growth" style="color: var(--primary-purple);">Almost Done</div>
         </div>
       </section>
 
-      <!-- Platforms Overview -->
+      <!-- Platforms Strip -->
       <section>
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-          <h3 style="font-size: 15px;">Platform Overview</h3>
-          <span onclick="openPlatformModal()" style="font-size: 12px; color: var(--accent-purple); cursor: pointer;">+ Update Numbers</span>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span style="font-size: 13px; font-weight: 700;">Connected Channels</span>
+          <span onclick="openProfileModal()" style="font-size: 11px; color: var(--primary-purple); cursor: pointer;">+ Edit Stats</span>
         </div>
-        <div class="platforms-scroll" id="platformsContainer"></div>
+        <div class="platform-slider" id="platformSlider"></div>
       </section>
 
-      <!-- 2-Column: AI Interactive Studio & Focus/History -->
-      <div class="grid-2-col">
-        <!-- AI Studio Box -->
-        <section class="card-box">
-          <div class="box-title">
-            <span id="aiToolHeading">📝 Script Lab (Viral Retention)</span>
-            <span style="font-size: 12px; color: var(--accent-purple);">Gemini 2.5 Flash</span>
-          </div>
-
-          <div id="aiInputSection">
-            <div class="ai-form-group" id="topicInputGroup">
-              <label>Topic / Concept / Idea</label>
-              <input type="text" id="aiTopic" class="ai-input" placeholder="e.g. 5 AI tools that will save you 10 hours a week">
-            </div>
-
-            <div class="ai-form-group" id="platformSelectGroup">
-              <label>Target Format & Tone</label>
-              <select id="aiPlatform" class="ai-select" style="margin-bottom: 8px;">
-                <option value="Instagram Reel / YouTube Shorts (60s)">Reel / Shorts (60s Vertical)</option>
-                <option value="Long Form YouTube Video (5-10 Mins)">Long-form YouTube Video</option>
-                <option value="TikTok Viral Fast-Cut">TikTok Fast-Cut</option>
-              </select>
-              <select id="aiTone" class="ai-select">
-                <option value="High Energy, Fast-Paced & Engaging">High Energy & Engaging</option>
-                <option value="Professional, Insightful & Authoritative">Professional & Insightful</option>
-                <option value="Storytelling & Relatable">Storytelling & Relatable</option>
-                <option value="Casual & Humorous">Casual & Humorous</option>
-              </select>
-            </div>
-
-            <div class="ai-form-group" id="commentReplyGroup" style="display: none;">
-              <label>Audience Comment / DM to Reply to</label>
-              <textarea id="aiComment" class="ai-textarea" placeholder="Paste the audience comment here to get 3 brand-ready, high-retention replies..."></textarea>
-            </div>
-
-            <button class="btn-generate" id="btnGenerate" onclick="generateAIContent()">⚡ Generate Viral Script</button>
-          </div>
-
-          <!-- AI Output Card -->
-          <div class="ai-output-box" id="aiOutput" style="display: none;"></div>
-        </section>
-
-        <!-- Right Side: Focus & MongoDB History -->
-        <div style="display: flex; flex-direction: column; gap: 20px;">
-          <!-- Tasks Box -->
-          <section class="card-box">
-            <div class="box-title">
-              <span>🎯 Today's Focus</span>
-              <button onclick="addTaskPrompt()" style="background: none; border: none; color: var(--accent-purple); cursor: pointer; font-weight: 600;">+ Add</button>
-            </div>
-            <div id="taskList"></div>
-          </section>
-
-          <!-- Saved History Box (Direct from MongoDB) -->
-          <section class="card-box">
-            <div class="box-title">
-              <span>🍃 MongoDB Saved History</span>
-              <span onclick="fetchRecentHistory()" style="font-size: 11px; color: var(--text-muted); cursor: pointer;">🔄 Refresh</span>
-            </div>
-            <div id="historyList">
-              <div style="font-size: 12px; color: var(--text-muted);">Fetching history...</div>
-            </div>
-          </section>
+      <!-- AI Studio Interactive App Box -->
+      <section class="studio-card" id="studio-section">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+          <h3 style="font-size: 15px; font-weight: 800;" id="currentToolHeading">📝 Viral Script Lab</h3>
+          <span style="font-size: 10px; background: rgba(139,92,246,0.2); color: var(--primary-purple); padding: 4px 8px; border-radius: 6px; font-weight: 700;">AI ACTIVE</span>
         </div>
-      </div>
+
+        <!-- Tool Selection Tabs -->
+        <div class="tool-selector-grid">
+          <button class="tool-btn active" onclick="selectAITool('script', this)">
+            <span>🎬</span> Script Lab
+          </button>
+          <button class="tool-btn" onclick="selectAITool('hooks', this)">
+            <span>🪝</span> Viral Hooks
+          </button>
+          <button class="tool-btn" onclick="selectAITool('reply', this)">
+            <span>💬</span> AI Reply
+          </button>
+          <button class="tool-btn" onclick="selectAITool('repurpose', this)">
+            <span>🔄</span> Repurpose
+          </button>
+          <button class="tool-btn" onclick="selectAITool('seo_tags', this)">
+            <span>🏷️</span> SEO Tags
+          </button>
+          <button class="tool-btn" onclick="selectAITool('thumbnail', this)">
+            <span>🖼️</span> Thumbnail
+          </button>
+        </div>
+
+        <!-- Input Section -->
+        <div id="topicGroup">
+          <input type="text" id="aiTopicInput" class="app-input" placeholder="Topic: e.g. 5 AI tools every creator must know in 2026">
+        </div>
+
+        <div id="replyGroup" style="display: none;">
+          <textarea id="aiCommentInput" class="app-textarea" placeholder="Paste viewer comment or DM here to get 3 professional replies..."></textarea>
+        </div>
+
+        <button class="btn-action-primary" id="btnExecuteAI" onclick="handleAIGeneration()">⚡ Generate with AI</button>
+
+        <!-- Dynamic Output Box -->
+        <div class="output-card" id="aiOutputCard" style="display: none;"></div>
+      </section>
+
+      <!-- Today's Tasks -->
+      <section class="studio-card" id="tasks-section">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <h3 style="font-size: 14px; font-weight: 800;">🎯 Today's Creator Tasks</h3>
+          <span onclick="addNewTaskPrompt()" style="font-size: 11px; color: var(--primary-purple); cursor: pointer; font-weight: 700;">+ Add Task</span>
+        </div>
+        <div id="taskListContainer" style="display: flex; flex-direction: column; gap: 8px;"></div>
+      </section>
     </div>
   </main>
 
-  <script src="app.js"></script>
-</body>
-</html>
+  <!-- Mobile Bottom Navigation (App Bar) -->
+  <nav class="mobile-navbar">
+    <button class="nav-tab-item active" onclick="scrollToSection('studio-section')">
+      <span class="icon">✨</span>
+      <span>Studio</span>
+    </button>
+    <button class="nav-tab-item" onclick="scrollToSection('metrics-section')">
+      <span class="icon">📊</span>
+      <span>Analytics</span>
+    </button>
+    <button class="nav-tab-item" onclick="scrollToSection('tasks-section')">
+      <span class="icon">🎯</span>
+      <span>Tasks</span>
+    </button>
+    <button class="nav-tab-item" onclick="openProfileModal()">
+      <span class="icon">⚙️</span>
+      <span>Profile</span>
+    </button>
+  </nav>
+
+  <script>
+    let activeTool = 'script';
+    let creatorState = JSON.parse(localStorage.getItem('menezo_data')) || {
+      name: 'Tanu',
+      followers: '125K',
+      views: '8.7M',
+      engagement: '8.3%',
+      platforms: [
+        { name: 'YouTube', stat: '125K', icon: '▶️' },
+        { name: 'Instagram', stat: '85K', icon: '📸' },
+        { name: 'TikTok', stat: '45K', icon: '🎵' },
+        { name: 'X (Twitter)', stat: '18K', icon: '𝕏' }
+      ],
+      tasks: [
+        { text: 'Finish viral YouTube Script', done: false },
+        { text: 'Edit 60s Reel with Hook', done: false },
+        { text: 'Reply to top comments with Menezo AI', done: true }
+      ]
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderAll();
+    });
+
+    function renderAll() {
+      document.getElementById('creatorNameTop').innerText = creatorState.name;
+      document.getElementById('greetingTitle').innerText = `Good Day, ${creatorState.name}! 👋`;
+      document.getElementById('avatarLetter').innerText = creatorState.name.charAt(0).toUpperCase();
+      document.getElementById('statFollowers').innerText = creatorState.followers;
+      document.getElementById('statViews').innerText = creatorState.views;
+      document.getElementById('statEngagement').innerText = creatorState.engagement;
+
+      // Render Channels
+      const slider = document.getElementById('platformSlider');
+      slider.innerHTML = '';
+      creatorState.platforms.forEach(p => {
+        slider.innerHTML += `
+          <div class="platform-card">
+            <div style="font-size: 11px; color: var(--text-muted);">${p.icon} ${p.name}</div>
+            <div style="font-size: 16px; font-weight: 800;">${p.stat}</div>
+          </div>
+        `;
+      });
+
+      // Render Tasks
+      const taskList = document.getElementById('taskListContainer');
+      taskList.innerHTML = '';
+      creatorState.tasks.forEach((t, index) => {
+        taskList.innerHTML += `
+          <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.03); padding: 10px 12px; border-radius: 10px; font-size: 12px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTask(${index})">
+              <span style="${t.done ? 'text-decoration: line-through; color: var(--text-muted);' : ''}">${t.text}</span>
+            </div>
+            <span onclick="deleteTask(${index})" style="color: #ef4444; cursor: pointer; font-size: 12px;">✕</span>
+          </div>
+        `;
+      });
+    }
+
+    function selectAITool(tool, el) {
+      activeTool = tool;
+      document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+
+      const heading = document.getElementById('currentToolHeading');
+      const topicGroup = document.getElementById('topicGroup');
+      const replyGroup = document.getElementById('replyGroup');
+      const topicInput = document.getElementById('aiTopicInput');
+
+      if (tool === 'reply') {
+        heading.innerText = '💬 Professional AI Comment Reply';
+        topicGroup.style.display = 'none';
+        replyGroup.style.display = 'block';
+      } else {
+        topicGroup.style.display = 'block';
+        replyGroup.style.display = 'none';
+        if (tool === 'script') heading.innerText = '📝 Viral Script Lab (60s)';
+        if (tool === 'hooks') heading.innerText = '🪝 5 Psychological Viral Hooks';
+        if (tool === 'repurpose') heading.innerText = '🔄 Multi-Platform Repurposer';
+        if (tool === 'seo_tags') heading.innerText = '🏷️ High-CTR SEO Titles & Tags';
+        if (tool === 'thumbnail') heading.innerText = '🖼️ Thumbnail Concept & AI Prompt';
+      }
+    }
+
+    async function handleAIGeneration() {
+      const topic = document.getElementById('aiTopicInput').value;
+      const comment = document.getElementById('aiCommentInput').value;
+      const btn = document.getElementById('btnExecuteAI');
+      const output = document.getElementById('aiOutputCard');
+
+      if (activeTool === 'reply' && !comment.trim()) {
+        alert('Kripya audience ka comment enter karein!');
+        return;
+      }
+      if (activeTool !== 'reply' && !topic.trim()) {
+        alert('Kripya ek topic
