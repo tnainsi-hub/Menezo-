@@ -1,136 +1,128 @@
+const express = require('express');
+const cors = require('cors');
+const path = require('path');
+const mongoose = require('mongoose');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+require('dotenv').config();
+
+const app = express();
+const PORT = process.env.PORT || 10000;
+
+app.use(cors());
+app.use(express.json());
+app.use(express.static(path.join(__dirname)));
+
+// 1. Safe MongoDB Connection
+const MONGO_URI = process.env.Mongo_DB || process.env.MONGO_URI || process.env.MONGODB_URI;
+
+let isDbConnected = false;
+if (MONGO_URI) {
+  mongoose.connect(MONGO_URI)
+    .then(() => {
+      isDbConnected = true;
+      console.log('🍃 MongoDB Database connected successfully!');
+    })
+    .catch((err) => {
+      console.log('⚠️ MongoDB Connection Failed (App will still run):', err.message);
+    });
+} else {
+  console.log('⚠️ Warning: Mongo_DB variable render par nahi mila.');
+}
+
+// 2. Database Schema
+const ScriptSchema = new mongoose.Schema({
+  type: String,
+  topic: String,
+  platform: String,
+  tone: String,
+  content: String,
+  createdAt: { type: Date, default: Date.now }
+});
+const SavedScript = mongoose.models.SavedScript || mongoose.model('SavedScript', ScriptSchema);
+
+// 3. Gemini Setup
+const apiKey = process.env.GEMINI_API_KEY;
+let genAI = null;
+if (apiKey) {
+  genAI = new GoogleGenerativeAI(apiKey);
+}
+
+// Health Route
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
+
+// AI Generate Route
 app.post('/api/ai/generate', async (req, res) => {
   try {
-    const { type, topic, tone, platform, audienceComment, extraDetails } = req.body;
+    const { type, topic, tone, platform, audienceComment } = req.body;
 
-    if (!apiKey) {
+    if (!apiKey || !genAI) {
       return res.status(500).json({ 
-        error: 'GEMINI_API_KEY render par set nahi hai.' 
+        error: 'GEMINI_API_KEY Render par set nahi hai.' 
       });
     }
 
-    let systemPrompt = '';
-
-    // ==========================================
-    // 1. SCRIPT LAB PROMPT (Reels, Shorts, YouTube)
-    // ==========================================
+    let prompt = '';
     if (type === 'script') {
-      systemPrompt = `You are Menezo AI, a world-class viral scriptwriter for top YouTubers and Instagram creators.
-Create a complete, high-retention script for:
-- Platform: ${platform || 'Instagram Reel / YouTube Shorts (60s)'}
-- Topic: "${topic}"
-- Creator Tone: ${tone || 'High Energy, Insightful, and Fast-Paced'}
-
-Format the output strictly like this:
----
-🎬 **TITLE / HOOK (0-3s)**:
-[Write a scroll-stopping visual + spoken hook line that creates an instant open loop]
-
-⚡ **THE PROBLEM / SETUP (3-15s)**:
-[Highlight the exact pain point or curiosity immediately]
-
-💡 **CORE VALUE & BREAKDOWN (15-45s)**:
-[Step 1, Step 2, Step 3 formatted with visual cues in brackets like (Show B-roll of app)]
-
-🚀 **POWERFUL CALL TO ACTION (CTA) (45-60s)**:
-[Natural engagement trigger — asking a specific question for comments and reason to follow]
----`;
-
-    // ==========================================
-    // 2. VIRAL HOOK GENERATOR (5 Psychological Angles)
-    // ==========================================
+      prompt = `Write a high-retention creator script for ${platform || 'Reels'} on topic: "${topic}". Tone: ${tone || 'High Energy'}. Structure: 1. Hook (0-3s), 2. Core Value, 3. CTA.`;
     } else if (type === 'hooks') {
-      systemPrompt = `You are Menezo AI, an expert in human psychology and viral retention.
-Generate 5 completely different, high-CTR hook lines for short-form video on the topic: "${topic}".
-
-Format output strictly as:
-1. 😱 **Fear / Warning Hook**: (Highlighting a mistake or risk the viewer is making)
-2. 🧐 **Curiosity Gap Hook**: (A secret or insight that forces them to keep watching)
-3. 📖 **Story / "I tried..." Hook**: (Relatable personal transformation or experiment)
-4. ⚡ **Quick Win / Cheat Code Hook**: (Promising an instant result with minimal effort)
-5. 💣 **Controversial / Hot Take Hook**: (Challenging a common industry belief)`;
-
-    // ==========================================
-    // 3. PROFESSIONAL COMMENT & DM REPLY ASSISTANT
-    // ==========================================
+      prompt = `Generate 5 viral hook angles (Fear, Curiosity, Story, Quick Value, Hot Take) for: "${topic}".`;
     } else if (type === 'reply') {
-      systemPrompt = `You are Menezo AI, serving as a dedicated creator branding assistant.
-A viewer left this comment/DM: "${audienceComment}".
-Creator Niche/Context: "${topic || 'General Content Creator'}".
-Tone required: ${tone || 'Polite, Professional, Friendly & Community-Building'}.
-
-Generate 3 distinct reply options:
-1. 🌟 **Option 1 (Friendly & Value-Add)**: Warm, appreciative, and adds extra helpful context.
-2. 🚀 **Option 2 (Short & Punchy)**: Quick, engaging, with a follow-up question to boost comment section algorithm.
-3. 💼 **Option 3 (Ultra Professional / Brand-Ready)**: Polite, articulate, and suitable for collaborations or high-profile viewers.`;
-
-    // ==========================================
-    // 4. CONTENT REPURPOSER (1 Idea -> Multiple Platforms)
-    // ==========================================
+      prompt = `Generate 3 professional replies for this comment: "${audienceComment}". Tone: ${tone || 'Professional'}.`;
     } else if (type === 'repurpose') {
-      systemPrompt = `You are Menezo AI, a multi-platform content repurposing engine.
-Take this core topic/script: "${topic}" and repurpose it for:
-
-🧵 **1. X (Twitter) Thread / Viral Post**:
-[Punchy tweet under 280 characters or a 3-bullet thread with high engagement value]
-
-💼 **2. LinkedIn Professional Post**:
-[Clean spacing, hook, business/creator lesson, takeaway, and question at the end]
-
-📸 **3. Instagram / Shorts Caption**:
-[2-3 lines engaging caption + 10 niche-specific, high-ranking hashtags]`;
-
-    // ==========================================
-    // 5. SEO & TAG / TITLE FINDER
-    // ==========================================
+      prompt = `Repurpose into Tweet, LinkedIn post, and Instagram caption with hashtags for: "${topic}".`;
     } else if (type === 'seo_tags') {
-      systemPrompt = `You are Menezo AI, an SEO and YouTube algorithm specialist.
-For the topic: "${topic}", generate:
-1. 🎯 **5 High-CTR Viral Video Titles** (Optimized for click-through rate without being pure clickbait)
-2. 📝 **SEO Video Description** (First 2 lines optimized for search ranking + bullet summary)
-3. 🏷️ **15 High-Volume Keyword Tags** (Comma separated, ready to copy-paste into YouTube/Instagram)`;
-
-    // ==========================================
-    // 6. THUMBNAIL VISUAL CONCEPT & PROMPT
-    // ==========================================
+      prompt = `Provide 5 viral titles and 15 SEO tags for: "${topic}".`;
     } else if (type === 'thumbnail') {
-      systemPrompt = `You are Menezo AI, a YouTube packaging and thumbnail design expert.
-Topic: "${topic}".
-Provide:
-1. 🖼️ **Thumbnail Concept**: (Describe the background, facial expression, main focal subject, and contrast colors)
-2. 🔤 **Thumbnail Text (Max 3-4 words)**: (High contrast, catchy phrase that complements—not repeats—the title)
-3. 🤖 **AI Image Generation Prompt (Midjourney / DALL-E)**: (Detailed prompt ready to copy-paste for generating the background/visual asset)`;
-
+      prompt = `Provide visual concept and Midjourney prompt for: "${topic}".`;
     } else {
-      systemPrompt = `You are Menezo AI, the All-in-One Creator Operating System. Provide an insightful, structured response for: "${topic}".`;
+      prompt = `Creator response on: "${topic}"`;
     }
 
-    // Call Gemini Model
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.6-flash',
-      contents: systemPrompt,
-    });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const resultText = response.text();
 
-    const resultText = response.text || 'Koi response generate nahi ho paya.';
-
-    // Auto save to MongoDB if connected
-    if (MONGO_URI) {
+    if (isDbConnected) {
       try {
         await SavedScript.create({
           type: type || 'custom',
           topic: topic || audienceComment || 'General',
-          platform: platform || 'Multi-platform',
-          tone: tone || 'Professional',
+          platform: platform || 'All',
+          tone: tone || 'Default',
           content: resultText
         });
-      } catch (dbErr) {
-        console.error('DB save error:', dbErr);
+      } catch (e) {
+        console.log('DB Save Skip:', e.message);
       }
     }
 
     res.json({ success: true, result: resultText });
-
   } catch (error) {
-    console.error('AI generation error:', error);
-    res.status(500).json({ error: 'AI generation error: ' + error.message });
+    console.error('AI Error:', error.message);
+    res.status(500).json({ error: error.message });
   }
+});
+
+// History Route
+app.get('/api/scripts/history', async (req, res) => {
+  try {
+    if (!isDbConnected) return res.json({ success: true, data: [] });
+    const history = await SavedScript.find().sort({ createdAt: -1 }).limit(10);
+    res.json({ success: true, data: history });
+  } catch (err) {
+    res.json({ success: true, data: [] });
+  }
+});
+
+// Serve frontend
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dashboard.html'));
+});
+
+// Start Server
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Menezo is live on port ${PORT}`);
 });
