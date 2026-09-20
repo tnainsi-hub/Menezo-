@@ -4,22 +4,22 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Menezo — Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <style>
   .chat-panel {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    width: 340px;
-    max-height: 460px;
+    width: 360px;
+    height: 480px;
     background: #13111c;
     border: 1px solid #2e2a3d;
     border-radius: 18px;
     display: none;
     flex-direction: column;
-    z-index: 1000;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    z-index: 9999;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.55);
   }
   .chat-header {
     padding: 14px 16px;
@@ -29,6 +29,7 @@
     justify-content: space-between;
     align-items: center;
     font-weight: 700;
+    color: white;
   }
   .chat-messages {
     flex: 1;
@@ -36,23 +37,24 @@
     padding: 14px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    max-height: 320px;
+    gap: 12px;
   }
   .msg {
-    padding: 10px 13px;
-    border-radius: 12px;
-    font-size: 13.5px;
-    line-height: 1.45;
-    max-width: 90%;
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-size: 14px;
+    line-height: 1.5;
+    max-width: 85%;
   }
   .msg.user {
     background: #7c3aed;
+    color: white;
     align-self: flex-end;
   }
   .msg.ai {
     background: #1e1b2e;
     border: 1px solid #2e2a3d;
+    color: #e2e8f0;
     align-self: flex-start;
   }
   .chat-input-area {
@@ -65,17 +67,17 @@
     flex: 1;
     background: #0c0916;
     border: 1px solid #2e2a3d;
-    border-radius: 10px;
-    padding: 10px 12px;
+    border-radius: 12px;
+    padding: 11px 14px;
     color: white;
-    font-size: 13.5px;
+    font-size: 14px;
   }
   .chat-input-area button {
     background: #7c3aed;
     border: none;
-    border-radius: 10px;
+    border-radius: 12px;
     color: white;
-    padding: 0 14px;
+    padding: 0 16px;
     font-weight: 600;
     cursor: pointer;
   }
@@ -83,21 +85,27 @@
     background: transparent;
     border: none;
     color: white;
-    font-size: 18px;
+    font-size: 22px;
     cursor: pointer;
+    line-height: 1;
   }
 </style>
 </head>
 <body>
 <div class="app">
   <aside id="sidebar-mount"></aside>
+
   <main>
     <div class="topbar" id="topbar-mount"></div>
 
     <div class="hero">
       <div class="hero-inner">
         <h1>Good <span id="greetTime">Evening</span>, <span id="displayName">Creator</span>! 👋</h1>
-        <p><span id="displayHandle">@you</span> · <span id="displayPlatform">YouTube</span> · <span id="displayNiche">General</span></p>
+        <p>
+          <span id="displayHandle">@you</span> · 
+          <span id="displayPlatform">YouTube</span> · 
+          <span id="displayNiche">General</span>
+        </p>
         <div class="stat-row" id="statRow"></div>
       </div>
     </div>
@@ -123,9 +131,9 @@
       <div class="card wellness">
         <h3>Creator Wellness</h3>
         <div class="ring">☕</div>
-        <div class="focus-num" id="focusHrs">2.5 hrs.</div>
+        <div class="focus-num">2.5 hrs</div>
         <div class="focus-lbl">Focused today — take a short break!</div>
-        <button onclick="startBreak()">Start Break Timer</button>
+        <button onclick="alert('Break timer started!')">Start Break Timer</button>
       </div>
     </div>
 
@@ -152,7 +160,7 @@
     <button class="close-chat" onclick="closeChat()">×</button>
   </div>
   <div class="chat-messages" id="chatMessages">
-    <div class="msg ai">Hi! Main Menezo AI hoon. Aaj kis cheez mein help chahiye? (script, title, ideas...)</div>
+    <div class="msg ai">Hi! Main Menezo AI hoon. Aaj kis cheez mein help chahiye? Script, title, ideas, ya growth tips?</div>
   </div>
   <div class="chat-input-area">
     <input type="text" id="chatInput" placeholder="Type your message..." onkeydown="if(event.key==='Enter') sendChat()">
@@ -163,103 +171,129 @@
 <script src="app.js"></script>
 <script>
   const user = requireLogin();
-  if (user) {
-    renderSidebar('dashboard', user);
-    renderTopbar(user);
+  if (!user) throw new Error("Not logged in");
 
-    document.getElementById('displayName').textContent = user.name || 'Creator';
-    document.getElementById('displayHandle').textContent = user.channelId || '@you';
-    document.getElementById('displayPlatform').textContent = user.platform || 'YouTube';
-    document.getElementById('displayNiche').textContent = user.niche || 'General';
-    document.getElementById('greetTime').textContent = greetingWord();
+  // Header
+  document.getElementById('displayName').textContent = user.name || 'Creator';
+  document.getElementById('displayHandle').textContent = user.channelId || '@you';
+  document.getElementById('displayPlatform').textContent = user.platform || 'YouTube';
+  document.getElementById('displayNiche').textContent = user.niche || 'General';
+  document.getElementById('greetTime').textContent = greetingWord();
 
-    // Stats
-    document.getElementById('statRow').innerHTML = `
-      <div class="stat"><div class="lbl">Followers</div><div class="num">${user.followers || '0'}</div></div>
-      <div class="stat"><div class="lbl">Creator Score</div><div class="num">${user.score || 50}</div></div>
-      <div class="stat"><div class="lbl">Tasks Today</div><div class="num" id="statTasks">0</div></div>
-    `;
+  renderSidebar('dashboard', user);
+  renderTopbar(user);
 
-    // Platform Overview
-    document.getElementById('overviewGrid').innerHTML = PLATFORMS.slice(0,4).map(p => {
-      const connected = p.key === user.platform;
-      return `<div class="ov-card ${connected ? 'connected' : 'locked'}">
-        <div class="ov-head"><span class="icon-badge \( {p.cls}"> \){p.icon}</span> ${p.key}</div>
-        <div class="ov-num">${connected ? user.followers : '—'}</div>
+  // Stats
+  document.getElementById('statRow').innerHTML = `
+    <div class="stat"><div class="lbl">Followers</div><div class="num">${user.followers || '0'}</div></div>
+    <div class="stat"><div class="lbl">Creator Score</div><div class="num">${user.score || 50}</div></div>
+    <div class="stat"><div class="lbl">Tasks Today</div><div class="num" id="statTasks">0</div></div>
+  `;
+
+  // Platform Overview
+  const platformsHTML = PLATFORMS.slice(0, 4).map(p => {
+    const connected = p.key === user.platform;
+    return `
+      <div class="ov-card ${connected ? 'connected' : 'locked'}">
+        <div class="ov-head">
+          <span class="icon-badge \( {p.cls}"> \){p.icon}</span> ${p.key}
+        </div>
+        <div class="ov-num">${connected ? (user.followers || '0') : '—'}</div>
         <div class="ov-lbl">${connected ? 'Followers' : 'Not connected'}</div>
-      </div>`;
-    }).join('');
+      </div>
+    `;
+  }).join('');
+  document.getElementById('overviewGrid').innerHTML = platformsHTML;
 
-    // Tasks
-    let tasks = JSON.parse(localStorage.getItem('menezo_tasks') || 'null') || [
-      { text: "Finish today's script", done: false },
-      { text: 'Reply to top comments', done: false },
-      { text: 'Plan next upload', done: false },
-    ];
-    function saveTasks(){ localStorage.setItem('menezo_tasks', JSON.stringify(tasks)); renderTasks(); }
-    function renderTasks(){
-      document.getElementById('taskList').innerHTML = tasks.map((t,i) => `
-        <div class="task \( {t.done?'done':''}" onclick="toggleTask( \){i})">
-          <span>\( {t.text}</span><span> \){t.done?'✓':''}</span>
-        </div>`).join('');
-      document.getElementById('statTasks').textContent = tasks.length;
-    }
-    window.toggleTask = function(i){ tasks[i].done = !tasks[i].done; saveTasks(); };
-    window.addTask = function(){
-      const input = document.getElementById('newTaskInput');
-      const v = input.value.trim();
-      if (!v) return;
-      tasks.push({ text:v, done:false });
-      input.value = '';
-      saveTasks();
-    };
-    renderTasks();
+  // Tasks
+  let tasks = JSON.parse(localStorage.getItem('menezo_tasks') || 'null') || [
+    { text: "Finish today's script", done: false },
+    { text: "Reply to top comments", done: false },
+    { text: "Plan next upload", done: false }
+  ];
 
-    // Insights
-    document.getElementById('insightList').innerHTML = [
-      ['Emotional storytelling with a twist', 'high'],
-      [`Day in the life — ${user.niche} edition`, 'rising'],
-      ['Behind the scenes is winning', 'high'],
-    ].map(([text, level]) => `
-      <div class="insight">
-        <span>↗ ${text}</span>
-        <span class="tag \( {level}"> \){level === 'high' ? 'High Opportunity' : 'Rising'}</span>
-      </div>`).join('');
-
-    window.startBreak = function(){ alert('Break timer started — 10 minutes!'); };
+  function renderTasks() {
+    const html = tasks.map((t, i) => `
+      <div class="task \( {t.done ? 'done' : ''}" onclick="toggleTask( \){i})">
+        <span>${t.text}</span>
+        <span>${t.done ? '✓' : ''}</span>
+      </div>
+    `).join('');
+    document.getElementById('taskList').innerHTML = html;
+    document.getElementById('statTasks').textContent = tasks.length;
   }
 
-  // ===== AI Chat Functions =====
+  window.toggleTask = function(i) {
+    tasks[i].done = !tasks[i].done;
+    localStorage.setItem('menezo_tasks', JSON.stringify(tasks));
+    renderTasks();
+  };
+
+  window.addTask = function() {
+    const input = document.getElementById('newTaskInput');
+    const text = input.value.trim();
+    if (!text) return;
+    tasks.push({ text: text, done: false });
+    input.value = '';
+    localStorage.setItem('menezo_tasks', JSON.stringify(tasks));
+    renderTasks();
+  };
+
+  renderTasks();
+
+  // Insights
+  const insights = [
+    { text: "Emotional storytelling with a twist", level: "high" },
+    { text: `Day in the life — ${user.niche} edition`, level: "rising" },
+    { text: "Behind the scenes is winning", level: "high" }
+  ];
+
+  document.getElementById('insightList').innerHTML = insights.map(item => `
+    <div class="insight">
+      <span>↗ ${item.text}</span>
+      <span class="tag \( {item.level}"> \){item.level === 'high' ? 'High Opportunity' : 'Rising'}</span>
+    </div>
+  `).join('');
+
+  // ===== AI Chat =====
+  let chatHistory = [];
+
   function openChat() {
     document.getElementById('chatPanel').style.display = 'flex';
   }
   function closeChat() {
     document.getElementById('chatPanel').style.display = 'none';
   }
+
   async function sendChat() {
     const input = document.getElementById('chatInput');
-    const msg = input.value.trim();
-    if (!msg) return;
+    const text = input.value.trim();
+    if (!text) return;
 
     const messagesDiv = document.getElementById('chatMessages');
-    
-    // User message
-    messagesDiv.innerHTML += `<div class="msg user">${msg}</div>`;
+
+    // Show user message
+    messagesDiv.innerHTML += `<div class="msg user">${text}</div>`;
     input.value = '';
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
+    // Add to history
+    chatHistory.push({ role: 'user', content: text });
+
     // Loading
-    messagesDiv.innerHTML += `<div class="msg ai" id="loading">Thinking...</div>`;
+    messagesDiv.innerHTML += `<div class="msg ai" id="loadingMsg">Thinking...</div>`;
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
     try {
-      const reply = await askAIManager(msg, user);
-      document.getElementById('loading').remove();
+      const reply = await askAIManager(text, user);
+      document.getElementById('loadingMsg').remove();
       messagesDiv.innerHTML += `<div class="msg ai">${reply}</div>`;
-    } catch (e) {
-      document.getElementById('loading').remove();
-      messagesDiv.innerHTML += `<div class="msg ai">Sorry, AI is temporarily unavailable. Try again.</div>`;
+      chatHistory.push({ role: 'ai', content: reply });
+    } catch (err) {
+      document.getElementById('loadingMsg').remove();
+      messagesDiv.innerHTML += `<div class="msg ai">Sorry, AI is temporarily unavailable. Please try again.</div>`;
     }
+
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
   }
 </script>
