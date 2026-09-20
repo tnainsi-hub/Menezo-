@@ -19,8 +19,8 @@ app.post('/api/ai/generate', async (req, res) => {
     if (!prompt) return res.status(400).json({ error: 'Prompt is required' });
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: `You are Menezo Creator OS AI.
+      model:'gemini-2.0-flash',
+      contents: `You are Menezo AI.
 Task: ${type || 'Content Generation'}
 Language: ${language || 'English'}
 Prompt: ${prompt}
@@ -51,7 +51,7 @@ app.post('/api/ai-manager-chat', async (req, res) => {
       : '';
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-2.0-flash',
       contents: `You are Menezo AI Manager. Give short and useful advice.
 ${context}
 
