@@ -1,716 +1,122 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Menezo — Create · Build · Grow</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  
-  <style>
-    :root {
-      --bg-dark: #07050e;
-      --bg-surface: #0e0a1a;
-      --bg-card: #130e24;
-      --bg-card-inner: #1a1332;
-      --border-subtle: rgba(255, 255, 255, 0.07);
-      --border-neon: rgba(168, 85, 247, 0.35);
-      --neon-purple: #a855f7;
-      --neon-pink: #ec4899;
-      --neon-cyan: #06b6d4;
-      --neon-green: #10b981;
-      --neon-orange: #f97316;
-      --text-white: #ffffff;
-      --text-muted: #8e8a9f;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    body {
-      background-color: var(--bg-dark);
-      color: var(--text-white);
-      display: flex;
-      min-height: 100vh;
-      overflow-x: hidden;
-      padding-bottom: 75px;
-    }
-
-    /* Desktop Sidebar */
-    .app-sidebar {
-      width: 230px;
-      background: var(--bg-surface);
-      border-right: 1px solid var(--border-subtle);
-      padding: 20px 14px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      flex-shrink: 0;
-      height: 100vh;
-      position: sticky;
-      top: 0;
-    }
-
-    .brand-box {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 22px;
-    }
-
-    .brand-logo {
-      font-size: 24px;
-      font-weight: 900;
-      background: linear-gradient(135deg, #c084fc, #f472b6);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .brand-name {
-      font-size: 18px;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-    }
-
-    .brand-sub {
-      font-size: 9px;
-      color: var(--text-muted);
-      letter-spacing: 0.5px;
-    }
-
-    .nav-label {
-      font-size: 10px;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      margin: 14px 0 6px 8px;
-    }
-
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 12px;
-      color: var(--text-muted);
-      font-size: 13px;
-      font-weight: 600;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .nav-item.active, .nav-item:hover {
-      background: rgba(168, 85, 247, 0.15);
-      color: #fff;
-      border-left: 3px solid var(--neon-purple);
-    }
-
-    .sidebar-pro {
-      background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(236, 72, 153, 0.1));
-      border: 1px solid var(--border-neon);
-      border-radius: 12px;
-      padding: 14px;
-      text-align: center;
-    }
-
-    .btn-upgrade {
-      background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
-      color: #fff;
-      border: none;
-      padding: 8px 14px;
-      border-radius: 8px;
-      font-weight: 700;
-      font-size: 12px;
-      cursor: pointer;
-      width: 100%;
-      margin-top: 8px;
-    }
-
-    /* Main Area */
-    .app-main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      max-width: 1350px;
-      margin: 0 auto;
-      width: 100%;
-    }
-
-    /* Top Bar */
-    .app-topbar {
-      padding: 14px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid var(--border-subtle);
-      background: rgba(7, 5, 14, 0.85);
-      backdrop-filter: blur(12px);
-      position: sticky;
-      top: 0;
-      z-index: 50;
-    }
-
-    .search-box {
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: 20px;
-      padding: 8px 16px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      width: 340px;
-    }
-
-    .search-box input {
-      background: transparent;
-      border: none;
-      outline: none;
-      color: #fff;
-      font-size: 13px;
-      width: 100%;
-    }
-
-    .creator-pill {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: var(--bg-card);
-      border: 1px solid var(--border-neon);
-      padding: 5px 12px;
-      border-radius: 30px;
-      cursor: pointer;
-    }
-
-    .creator-avatar {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #a855f7, #ec4899);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 12px;
-    }
-
-    /* Content */
-    .app-content {
-      padding: 20px 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-    }
-
-    /* Hero Banner (Mockup Style) */
-    .hero-banner {
-      background: linear-gradient(90deg, #18112e 0%, #20133c 60%, #150d2c 100%);
-      border: 1px solid var(--border-neon);
-      border-radius: 16px;
-      padding: 24px 28px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: relative;
-    }
-
-    .hero-banner h1 {
-      font-size: 24px;
-      font-weight: 800;
-      margin-bottom: 4px;
-    }
-
-    .hero-badge-tag {
-      font-size: 11px;
-      color: var(--neon-purple);
-      font-weight: 700;
-    }
-
-    /* Top 4 Metrics */
-    .metrics-row {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-    }
-
-    .metric-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: 14px;
-      padding: 16px;
-    }
-
-    .metric-title {
-      font-size: 12px;
-      color: var(--text-muted);
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 6px;
-    }
-
-    .metric-val {
-      font-size: 22px;
-      font-weight: 800;
-      color: #fff;
-    }
-
-    .metric-sub {
-      font-size: 11px;
-      color: var(--neon-green);
-      font-weight: 600;
-      margin-top: 4px;
-    }
-
-    /* Platform Overview Horizontal Strip */
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-
-    .section-title {
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    .section-link {
-      font-size: 12px;
-      color: var(--neon-purple);
-      cursor: pointer;
-      text-decoration: none;
-    }
-
-    .platforms-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-      gap: 10px;
-    }
-
-    .platform-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: 12px;
-      padding: 12px 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .platform-name {
-      font-size: 11px;
-      color: var(--text-muted);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .platform-stat {
-      font-size: 17px;
-      font-weight: 800;
-    }
-
-    /* Sparkline graph visualization */
-    .sparkline {
-      width: 100%;
-      height: 18px;
-      margin-top: 4px;
-    }
-
-    /* 3-Column Studio Grid */
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: 1.2fr 1fr 1fr;
-      gap: 14px;
-    }
-
-    .panel-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: 14px;
-      padding: 18px;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .panel-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 14px;
-    }
-
-    .panel-title {
-      font-size: 14px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    /* AI Studio Workspace (Inside Center) */
-    .ai-tool-tabs {
-      display: flex;
-      gap: 6px;
-      overflow-x: auto;
-      margin-bottom: 12px;
-      padding-bottom: 4px;
-    }
-
-    .ai-tab {
-      background: var(--bg-card-inner);
-      border: 1px solid var(--border-subtle);
-      color: var(--text-muted);
-      padding: 6px 12px;
-      border-radius: 8px;
-      font-size: 11px;
-      font-weight: 700;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-
-    .ai-tab.active {
-      background: rgba(168, 85, 247, 0.25);
-      border-color: var(--neon-purple);
-      color: #fff;
-    }
-
-    .app-input, .app-textarea {
-      width: 100%;
-      background: var(--bg-card-inner);
-      border: 1px solid var(--border-subtle);
-      color: #fff;
-      padding: 10px 12px;
-      border-radius: 8px;
-      font-size: 12px;
-      outline: none;
-      margin-bottom: 10px;
-    }
-
-    .app-input:focus, .app-textarea:focus {
-      border-color: var(--neon-purple);
-    }
-
-    .btn-generate-main {
-      width: 100%;
-      background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
-      color: #fff;
-      border: none;
-      padding: 11px;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-
-    .ai-output-box {
-      margin-top: 12px;
-      background: var(--bg-card-inner);
-      border: 1px solid var(--border-neon);
-      border-radius: 8px;
-      padding: 12px;
-      font-size: 12px;
-      line-height: 1.6;
-      white-space: pre-wrap;
-      max-height: 220px;
-      overflow-y: auto;
-    }
-
-    /* Tasks and Insights Rows */
-    .task-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 8px 10px;
-      background: var(--bg-card-inner);
-      border-radius: 8px;
-      margin-bottom: 8px;
-      font-size: 12px;
-    }
-
-    .insight-item {
-      padding: 10px;
-      background: var(--bg-card-inner);
-      border-radius: 8px;
-      margin-bottom: 8px;
-      font-size: 12px;
-      display: flex;
-      gap: 8px;
-      align-items: flex-start;
-    }
-
-    /* Mobile Bottom Bar (Mockup Style with Center + Button) */
-    .mobile-bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 65px;
-      background: rgba(14, 10, 26, 0.95);
-      backdrop-filter: blur(16px);
-      border-top: 1px solid var(--border-subtle);
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      z-index: 100;
-      padding: 0 10px;
-    }
-
-    .mobile-nav-btn {
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      font-size: 10px;
-      font-weight: 600;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 3px;
-      cursor: pointer;
-    }
-
-    .mobile-nav-btn.active {
-      color: var(--neon-purple);
-    }
-
-    .mobile-plus-btn {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--neon-purple), var(--neon-orange));
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      border: none;
-      box-shadow: 0 4px 15px rgba(249, 115, 22, 0.4);
-      cursor: pointer;
-      transform: translateY(-8px);
-    }
-
-    /* Responsiveness */
-    @media (max-width: 900px) {
-      .app-sidebar { display: none; }
-      .metrics-row { grid-template-columns: repeat(2, 1fr); }
-      .dashboard-grid { grid-template-columns: 1fr; }
-      .search-box { width: 180px; }
-      .hero-banner { flex-direction: column; text-align: center; gap: 10px; }
-    }
-
-    @media (min-width: 901px) {
-      .mobile-bottom-nav { display: none; }
-      body { padding-bottom: 0; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Menezo — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- Desktop Sidebar -->
-  <aside class="app-sidebar">
-    <div>
-      <div class="brand-box">
-        <div class="brand-logo">M</div>
-        <div>
-          <div class="brand-name">Menezo</div>
-          <div class="brand-sub">CREATE · BUILD · GROW</div>
-        </div>
+<div class="app">
+  <aside id="sidebar-mount"></aside>
+  <main>
+    <div class="topbar" id="topbar-mount"></div>
+    <div class="hero">
+      <div class="hero-inner">
+        <h1>Good <span id="greetTime">Evening</span>, <span id="displayName">Creator</span>! 👋 <a class="switch-link" href="login.html">switch</a></h1>
+        <p><span id="displayHandle">@you</span> · <span id="displayPlatform">YouTube</span> · <span id="displayNiche">General</span></p>
+        <div class="stat-row" id="statRow"></div>
       </div>
-
-      <div class="nav-label">Main</div>
-      <div class="nav-item active">⚡ Dashboard</div>
-
-      <div class="nav-label">Platforms</div>
-      <div class="nav-item" onclick="openStatsEditor()">▶️ YouTube</div>
-      <div class="nav-item" onclick="openStatsEditor()">📸 Instagram</div>
-      <div class="nav-item" onclick="openStatsEditor()">🎵 TikTok</div>
-      <div class="nav-item" onclick="openStatsEditor()">𝕏 X (Twitter)</div>
-      <div class="nav-item" onclick="openStatsEditor()" style="color: var(--neon-purple);">➕ Add / Edit Stats</div>
-
-      <div class="nav-label">AI Studio</div>
-      <div class="nav-item" onclick="switchTool('script')">📝 Script Lab</div>
-      <div class="nav-item" onclick="switchTool('hooks')">🪝 Viral Hooks</div>
-      <div class="nav-item" onclick="switchTool('reply')">💬 AI Reply Pro</div>
-      <div class="nav-item" onclick="switchTool('seo_tags')">🏷️ SEO Checker</div>
     </div>
-
-    <div class="sidebar-pro">
-      <div style="font-size: 13px; font-weight: 800;">👑 Menezo Pro</div>
-      <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">Scale your creator workflow</div>
-      <button class="btn-upgrade">Upgrade Now</button>
-    </div>
-  </aside>
-
-  <!-- Main Container -->
-  <main class="app-main">
-    <!-- Topbar -->
-    <header class="app-topbar">
-      <div class="search-box">
-        <span style="font-size: 13px;">🔍</span>
-        <input type="text" placeholder="Search tools, projects, scripts...">
+    <div class="section-title"><h2>Platform Overview</h2></div>
+    <div class="overview-grid" id="overviewGrid"></div>
+    <div class="bottom-grid">
+      <div class="card">
+        <h3>Today's Focus</h3>
+        <div id="taskList"></div>
+        <div class="addtask">
+          <input type="text" id="newTaskInput" placeholder="Add a task...">
+          <button onclick="addTask()">Add</button>
+        </div>
       </div>
-
-      <div class="creator-pill" onclick="openStatsEditor()">
-        <div class="creator-avatar" id="avatarLetter">T</div>
-        <div>
-          <div id="creatorNameTop" style="font-size: 12px; font-weight: 700;">Tanu</div>
-          <div style="font-size: 9px; color: var(--text-muted);">Creator</div>
+      <div class="card">
+        <h3>🤖 AI Talent Manager</h3>
+        <div class="chat-log" id="chatLog" style="max-height:150px; overflow-y:auto; margin-bottom:10px;"></div>
+        <div style="display:flex; gap:8px;">
+          <input type="text" id="chatInput" placeholder="Ask your AI manager anything..." style="flex:1; background:rgba(255,255,255,.04); border:1px solid var(--line); border-radius:10px; padding:9px 11px; color:var(--text); font-size:12px;" onkeydown="if(event.key==='Enter')sendChat()">
+          <button onclick="sendChat()" style="background:var(--grad); border:none; border-radius:10px; padding:0 14px; color:#fff; font-weight:700; cursor:pointer;">Ask</button>
         </div>
-        <span style="font-size: 10px; color: var(--text-muted);">▾</span>
-      </div>
-    </header>
-
-    <!-- Main Dashboard Content -->
-    <div class="app-content">
-      <!-- Hero Banner -->
-      <section class="hero-banner">
-        <div>
-          <h1 id="greetingHeading">Good Evening, Tanu! 👋</h1>
-          <p style="font-size: 13px; color: var(--text-muted);">Here's what's happening with your content today.</p>
-        </div>
-        <button class="btn-upgrade" style="width: auto; padding: 10px 18px; margin: 0;" onclick="focusAIGenerator()">✨ Create Script</button>
-      </section>
-
-      <!-- 4 Stats Cards -->
-      <section class="metrics-row">
-        <div class="metric-card">
-          <div class="metric-title"><span>Total Followers</span> 👥</div>
-          <div class="metric-val" id="statFollowers">125K</div>
-          <div class="metric-sub">↑ 12% vs last 7 days</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-title"><span>Total Views</span> 👁️</div>
-          <div class="metric-val" id="statViews">8.7M</div>
-          <div class="metric-sub">↑ 18% vs last 7 days</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-title"><span>Engagement Rate</span> 🔥</div>
-          <div class="metric-val" id="statEngagement">8.3%</div>
-          <div class="metric-sub">↑ 9% vs last 7 days</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-title"><span>Daily Goal</span> 🎯</div>
-          <div class="metric-val">75%</div>
-          <div class="metric-sub" style="color: var(--neon-purple);">Keep going!</div>
-        </div>
-      </section>
-
-      <!-- Platform Overview -->
-      <section>
-        <div class="section-header">
-          <span class="section-title">Platform Overview</span>
-          <span class="section-link" onclick="openStatsEditor()">+ Update Real Data</span>
-        </div>
-        <div class="platforms-grid" id="platformsGrid">
-          <!-- Dynamic Platform Cards with Sparklines -->
-        </div>
-      </section>
-
-      <!-- 3-Column Bottom Grid -->
-      <div class="dashboard-grid">
-        <!-- Center: AI Studio Lab -->
-        <section class="panel-card" style="border-color: var(--border-neon);">
-          <div class="panel-header">
-            <span class="panel-title">⚡ AI Studio Lab</span>
-            <span style="font-size: 10px; color: var(--neon-purple); font-weight: 700;">GEMINI 2.5</span>
-          </div>
-
-          <div class="ai-tool-tabs">
-            <button class="ai-tab active" onclick="switchTool('script', this)">📝 Script Lab</button>
-            <button class="ai-tab" onclick="switchTool('hooks', this)">🪝 Viral Hooks</button>
-            <button class="ai-tab" onclick="switchTool('reply', this)">💬 AI Reply</button>
-            <button class="ai-tab" onclick="switchTool('seo_tags', this)">🏷️ SEO Tags</button>
-          </div>
-
-          <div id="topicField">
-            <input type="text" id="aiTopicInput" class="app-input" placeholder="Enter topic: e.g. 5 AI tools that will save you 10 hours a week">
-          </div>
-
-          <div id="replyField" style="display: none;">
-            <textarea id="aiCommentInput" class="app-textarea" placeholder="Paste viewer comment/DM to get 3 professional replies..."></textarea>
-          </div>
-
-          <button class="btn-generate-main" id="btnAI" onclick="runAIGeneration()">⚡ Generate with Menezo AI</button>
-
-          <div class="ai-output-box" id="aiOutput" style="display: none;"></div>
-        </section>
-
-        <!-- Today's Focus -->
-        <section class="panel-card">
-          <div class="panel-header">
-            <span class="panel-title">🎯 Today's Focus</span>
-            <span class="section-link" onclick="addTaskPrompt()">+ Add</span>
-          </div>
-          <div id="taskList">
-            <!-- Dynamic Tasks -->
-          </div>
-        </section>
-
-        <!-- AI Insights & Wellness -->
-        <section class="panel-card">
-          <div class="panel-header">
-            <span class="panel-title">💡 AI Insights</span>
-            <span style="font-size: 11px; color: var(--text-muted);">Real-time</span>
-          </div>
-          <div class="insight-item">
-            <span>📈</span>
-            <div>
-              <strong>Best Posting Time</strong>
-              <div style="font-size: 11px; color: var(--text-muted);">Your YouTube audience is most active between 7 PM - 10 PM.</div>
-            </div>
-          </div>
-          <div class="insight-item">
-            <span>🔥</span>
-            <div>
-              <strong>Trending Topic in Niche</strong>
-              <div style="font-size: 11px; color: var(--text-muted);">"AI Tools for Creators" engagement increased by 14% this week.</div>
-            </div>
-          </div>
-        </section>
       </div>
     </div>
   </main>
+</div>
 
-  <!-- Mobile Bottom Nav (Exact Mockup Style) -->
-  <nav class="mobile-bottom-nav">
-    <button class="mobile-nav-btn active" onclick="scrollToTop()">
-      <span style="font-size: 16px;">🏠</span>
-      <span>Home</span>
-    </button>
-    <button class="mobile-nav-btn" onclick="openStatsEditor()">
-      <span style="font-size: 16px;">📊</span>
-      <span>Platforms</span>
-    </button>
-    <button class="mobile-plus-btn" onclick="focusAIGenerator()">+</button>
-    <button class="mobile-nav-btn" onclick="focusAIGenerator()">
-      <span style="font-size: 16px;">✨</span>
-      <span>AI Studio</span>
-    </button>
-    <button class="mobile-nav-btn" onclick="openStatsEditor()">
-      <span style="font-size: 16px;">⚙️</span>
-      <span>Profile</span>
-    </button>
-  </nav>
+<script src="app.js"></script>
+<script>
+  const user = requireLogin();
+  if (user) {
+    renderSidebar('dashboard', user);
+    renderTopbar(user);
 
-  <script>
-    let activeTool = 'script';
-    
-    // Creator Data State
-    let creatorState = JSON.parse(localStorage.getItem('menezo_data')) || {
-      name: 'Tanu',
-      followers: '125K',
-      views: '8.7M',
-      engagement: '8.3%',
-      platforms: [
-        { name: 'YouTube', stat: '125K', label: 'Subscribers', color: '#ef4444', icon: '▶️' },
-        { name: 'Instagram', stat: '85K', label: 'Followers', color: '#ec4899', icon: '📸'
+    const first = (user.name || 'Creator').split(' ')[0];
+    document.getElementById('displayName').textContent = first;
+    document.getElementById('displayHandle').textContent = user.channelId;
+    document.getElementById('displayPlatform').textContent = user.platform;
+    document.getElementById('displayNiche').textContent = user.niche;
+    document.getElementById('greetTime').textContent = greetingWord();
+
+    document.getElementById('statRow').innerHTML = `
+      <div class="stat"><div class="lbl">Followers</div><div class="num">${user.followers}</div><div class="delta">On ${user.platform}</div></div>
+      <div class="stat"><div class="lbl">Creator Score</div><div class="num">${user.score || 50}</div><div class="delta">↑ Building momentum</div></div>
+      <div class="stat"><div class="lbl">Tasks Today</div><div class="num" id="statTasks">0</div><div class="delta" id="statTasksDone">0 done</div></div>
+    `;
+
+    document.getElementById('overviewGrid').innerHTML = PLATFORMS.slice(0,4).map((p,i) => {
+      const connected = p.key === user.platform;
+      return `<div class="ov-card ${connected?'connected':'locked'}">
+        ${!connected ? '<span class="ov-locked-tag">Connect</span>' : ''}
+        <div class="ov-head"><span class="icon-badge ${p.cls}">${p.icon}</span>${p.key}</div>
+        <div class="ov-num">${connected ? user.followers : '—'}</div>
+        <div class="ov-lbl">${connected ? 'Followers' : 'Not connected'}</div>
+      </div>`;
+    }).join('');
+
+    let tasks = JSON.parse(localStorage.getItem('menezo_tasks') || 'null') || [
+      { text:"Finish today's script", done:false },
+      { text:'Reply to top comments', done:false },
+    ];
+    function saveTasks(){ localStorage.setItem('menezo_tasks', JSON.stringify(tasks)); renderTasks(); }
+    function renderTasks(){
+      document.getElementById('taskList').innerHTML = tasks.map((t,i) => `
+        <div class="task ${t.done?'done':''}" onclick="toggleTask(${i})">
+          <span>${t.text}</span><span>${t.done?'✓':''}</span>
+        </div>`).join('');
+      document.getElementById('statTasks').textContent = tasks.length;
+      document.getElementById('statTasksDone').textContent = tasks.filter(t=>t.done).length + ' done';
+    }
+    window.toggleTask = function(i){ tasks[i].done = !tasks[i].done; saveTasks(); };
+    window.addTask = function(){
+      const input = document.getElementById('newTaskInput');
+      const v = input.value.trim();
+      if (!v) return;
+      tasks.push({ text:v, done:false });
+      input.value = '';
+      saveTasks();
+    };
+    renderTasks();
+
+    function appendMsg(role, text){
+      const log = document.getElementById('chatLog');
+      const div = document.createElement('div');
+      div.style.cssText = role==='user' ? 'background:rgba(124,58,237,.22); color:#e9d8ff; margin-left:20px; text-align:right; padding:8px 10px; border-radius:10px; margin-bottom:6px; font-size:12px;' : 'background:rgba(255,255,255,.04); color:#d8d2ea; padding:8px 10px; border-radius:10px; margin-bottom:6px; font-size:12px;';
+      div.textContent = text;
+      log.appendChild(div);
+      log.scrollTop = log.scrollHeight;
+    }
+    window.sendChat = async function(){
+      const input = document.getElementById('chatInput');
+      const msg = input.value.trim();
+      if (!msg) return;
+      appendMsg('user', msg);
+      input.value = '';
+      const reply = await askAIManager(msg, user);
+      appendMsg('ai', reply);
+    };
+    appendMsg('ai', `Hi ${first}! Ask me for hooks, captions, or a content plan.`);
+  }
+</script>
+</body>
+</html>
