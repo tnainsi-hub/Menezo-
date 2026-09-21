@@ -34,7 +34,7 @@ app.post('/api/ai-manager-chat', async (req, res) => {
       return res.json({ reply: `[AI Manager for ${name}]: Focus on high-retention hooks and post at 7:30 PM.` });
     }
     const prompt = `You are the AI Talent Manager on Menezo for ${name} (${handle}, Niche: ${niche}). Give sharp, actionable creator advice for: "${message}"`;
-    const response = await ai.models.generateContent({ model: "gemini-2.5-flash", contents: prompt });
+    const response = await ai.models.generateContent({ model: "gemini-3.6-flash", contents: prompt });
     res.json({ reply: response.text });
   } catch (err) {
     console.error('Gemini Error:', err.message);
