@@ -1,128 +1,48 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const mongoose = require('mongoose');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { GoogleGenAI } = require('@google/genai');
 require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 10000;
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname)));
+app.use(express.static(__dirname));
 
-// 1. Safe MongoDB Connection
-const MONGO_URI = process.env.Mongo_DB || process.env.MONGO_URI || process.env.MONGODB_URI;
-
-let isDbConnected = false;
-if (MONGO_URI) {
-  mongoose.connect(MONGO_URI)
-    .then(() => {
-      isDbConnected = true;
-      console.log('🍃 MongoDB Database connected successfully!');
-    })
-    .catch((err) => {
-      console.log('⚠️ MongoDB Connection Failed (App will still run):', err.message);
-    });
-} else {
-  console.log('⚠️ Warning: Mongo_DB variable render par nahi mila.');
+function getGeminiClient() {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) return null;
+  return new GoogleGenAI({ apiKey });
 }
 
-// 2. Database Schema
-const ScriptSchema = new mongoose.Schema({
-  type: String,
-  topic: String,
-  platform: String,
-  tone: String,
-  content: String,
-  createdAt: { type: Date, default: Date.now }
-});
-const SavedScript = mongoose.models.SavedScript || mongoose.model('SavedScript', ScriptSchema);
-
-// 3. Gemini Setup
-const apiKey = process.env.GEMINI_API_KEY;
-let genAI = null;
-if (apiKey) {
-  genAI = new GoogleGenerativeAI(apiKey);
-}
-
-// Health Route
-app.get('/health', (req, res) => {
-  res.status(200).send('OK');
+app.post('/api/login', (req, res) => {
+  console.log('Login:', req.body.name, req.body.channelId);
+  res.json({ success: true, user: req.body });
 });
 
-// AI Generate Route
-app.post('/api/ai/generate', async (req, res) => {
+app.post('/api/ai-manager-chat', async (req, res) => {
+  const { message, creatorContext } = req.body;
+  const name = creatorContext?.name || 'Creator';
+  const handle = creatorContext?.handle || '@you';
+  const niche = creatorContext?.niche || 'General';
+
   try {
-    const { type, topic, tone, platform, audienceComment } = req.body;
-
-    if (!apiKey || !genAI) {
-      return res.status(500).json({ 
-        error: 'GEMINI_API_KEY Render par set nahi hai.' 
-      });
+    const ai = getGeminiClient();
+    if (!ai) {
+      return res.json({ reply: `[AI Manager for ${name}]: Focus on high-retention hooks and post at 7:30 PM.` });
     }
-
-    let prompt = '';
-    if (type === 'script') {
-      prompt = `Write a high-retention creator script for ${platform || 'Reels'} on topic: "${topic}". Tone: ${tone || 'High Energy'}. Structure: 1. Hook (0-3s), 2. Core Value, 3. CTA.`;
-    } else if (type === 'hooks') {
-      prompt = `Generate 5 viral hook angles (Fear, Curiosity, Story, Quick Value, Hot Take) for: "${topic}".`;
-    } else if (type === 'reply') {
-      prompt = `Generate 3 professional replies for this comment: "${audienceComment}". Tone: ${tone || 'Professional'}.`;
-    } else if (type === 'repurpose') {
-      prompt = `Repurpose into Tweet, LinkedIn post, and Instagram caption with hashtags for: "${topic}".`;
-    } else if (type === 'seo_tags') {
-      prompt = `Provide 5 viral titles and 15 SEO tags for: "${topic}".`;
-    } else if (type === 'thumbnail') {
-      prompt = `Provide visual concept and Midjourney prompt for: "${topic}".`;
-    } else {
-      prompt = `Creator response on: "${topic}"`;
-    }
-
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const resultText = response.text();
-
-    if (isDbConnected) {
-      try {
-        await SavedScript.create({
-          type: type || 'custom',
-          topic: topic || audienceComment || 'General',
-          platform: platform || 'All',
-          tone: tone || 'Default',
-          content: resultText
-        });
-      } catch (e) {
-        console.log('DB Save Skip:', e.message);
-      }
-    }
-
-    res.json({ success: true, result: resultText });
-  } catch (error) {
-    console.error('AI Error:', error.message);
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// History Route
-app.get('/api/scripts/history', async (req, res) => {
-  try {
-    if (!isDbConnected) return res.json({ success: true, data: [] });
-    const history = await SavedScript.find().sort({ createdAt: -1 }).limit(10);
-    res.json({ success: true, data: history });
+    const prompt = `You are the AI Talent Manager on Menezo for ${name} (${handle}, Niche: ${niche}). Give sharp, actionable creator advice for: "${message}"`;
+    const response = await ai.models.generateContent({ model: "gemini-2.5-flash", contents: prompt });
+    res.json({ reply: response.text });
   } catch (err) {
-    res.json({ success: true, data: [] });
+    console.error('Gemini Error:', err.message);
+    res.json({ reply: `[AI Manager for ${name}]: Focus on high-retention hooks and post at 7:30 PM.` });
   }
 });
 
-// Serve frontend
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dashboard.html'));
-});
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 
-// Start Server
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Menezo is live on port ${PORT}`);
-});
+const PORT_NUM = process.env.PORT || 3000;
+app.listen(PORT_NUM, '0.0.0.0', () => console.log(`Menezo running on port ${PORT_NUM}`));
